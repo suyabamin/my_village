@@ -1,0 +1,147 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function hasRole(role) {
+      return isSignedIn() && 
+        (getUserData().roles.hasAny([role]) || getUserData().roles.hasAny(['super_admin']));
+    }
+    
+    function isSuperAdmin() {
+      return isSignedIn() && getUserData().roles.hasAny(['super_admin']);
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+    
+    // Site Settings
+    match /site_settings/{settingId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    
+    // Map Locations
+    match /map_locations/{locId} {
+      allow read: if true;
+      allow write: if isSuperAdmin() || hasRole('emergency_admin');
+    }
+    
+    // Agriculture Fields & Machinery & Land Leases
+    match /agriculture_fields/{fieldId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    match /agricultural_machines/{machineId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.createdBy) || isSuperAdmin();
+    }
+    match /land_leases/{leaseId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.createdBy) || isSuperAdmin();
+    }
+    
+    // Sports & Tournaments & Teams & Matches
+    match /tournaments/{tId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.createdBy) || hasRole('game_admin');
+    }
+    match /tournament_registrations/{regId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.createdBy) || hasRole('game_admin');
+    }
+    match /matches/{matchId} {
+      allow read: if true;
+      allow write: if hasRole('game_admin');
+    }
+    match /teams/{teamId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.createdBy) || hasRole('game_admin');
+    }
+    
+    // Education & Mosques
+    match /institutions/{instId} {
+      allow read: if true;
+      allow write: if hasRole('education_admin');
+    }
+    match /institution_events/{evtId} {
+      allow read: if true;
+      allow write: if hasRole('education_admin');
+    }
+    match /mosques/{mosqueId} {
+      allow read: if true;
+      allow write: if hasRole('mosque_admin');
+    }
+    
+    // Organization
+    match /organization/{docId} {
+      allow read: if true;
+      allow write: if hasRole('organization_admin');
+    }
+    match /organization_events/{evtId} {
+      allow read: if true;
+      allow write: if hasRole('organization_admin');
+    }
+    match /organization_programs/{progId} {
+      allow read: if true;
+      allow write: if hasRole('organization_admin');
+    }
+    match /organization_gallery/{imgId} {
+      allow read: if true;
+      allow write: if hasRole('organization_admin');
+    }
+    
+    // Events
+    match /cultural_events/{evtId} {
+      allow read: if true;
+      allow write: if hasRole('cultural_admin');
+    }
+    match /social_events/{evtId} {
+      allow read: if true;
+      allow write: if hasRole('social_admin');
+    }
+    match /emergency_meetings/{evtId} {
+      allow read: if true;
+      allow write: if hasRole('emergency_admin');
+    }
+    match /religious_events/{evtId} {
+      allow read: if true;
+      allow write: if hasRole('religious_admin');
+    }
+    
+    // Notifications
+    match /notifications/{notifId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Audit Logs
+    match /admin_logs/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isSignedIn();
+    }
+  }
+}

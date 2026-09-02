@@ -6,7 +6,6 @@ import {
   Sun, 
   Moon, 
   Menu, 
-  X, 
   User, 
   LogOut, 
   MapPin, 
@@ -20,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export const Header = ({ onOpenMobileNav }) => {
-  const { currentUser, userProfile, logout, isSuperAdmin } = useAuth();
+  const { currentUser, userProfile, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,37 +44,38 @@ export const Header = ({ onOpenMobileNav }) => {
 
   return (
     <header className="header-glass">
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '72px' }}>
+      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '68px' }}>
         
         {/* Brand Logo & Title */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none' }}>
           <div style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '12px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
             backgroundColor: 'var(--color-primary-600)',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontWeight: 'bold',
-            fontSize: '1.25rem',
-            boxShadow: '0 4px 10px rgba(22, 163, 74, 0.3)'
+            fontSize: '1.2rem',
+            boxShadow: '0 3px 8px rgba(22, 163, 74, 0.3)',
+            flexShrink: 0
           }}>
             আ
           </div>
           <div>
-            <div style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-main)', lineHeight: '1.2' }}>
+            <div style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)', fontWeight: '700', color: 'var(--text-main)', lineHeight: '1.2' }}>
               আলমদীপাড়া
             </div>
-            <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--color-primary-600)', letterSpacing: '0.5px' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: '600', color: 'var(--color-primary-600)', letterSpacing: '0.5px' }}>
               ডিজিটাল গ্রাম
             </div>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav style={{ display: 'none', gap: '0.5rem', alignItems: 'center' }} className="desktop-nav-links">
+        <nav style={{ display: 'none', gap: '0.35rem', alignItems: 'center' }} className="desktop-nav-links">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -83,7 +83,7 @@ export const Header = ({ onOpenMobileNav }) => {
                 key={item.path}
                 to={item.path}
                 style={{
-                  padding: '0.5rem 0.85rem',
+                  padding: '0.45rem 0.75rem',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.92rem',
                   fontWeight: isActive ? '700' : '500',
@@ -101,8 +101,8 @@ export const Header = ({ onOpenMobileNav }) => {
           })}
         </nav>
 
-        {/* Action controls (Theme Toggle, Auth / User Menu) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {/* Action controls (Theme Toggle, Auth / User Menu, Touch-friendly icons) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {/* Light/Dark Mode Switcher */}
           <button
             onClick={toggleTheme}
@@ -111,8 +111,8 @@ export const Header = ({ onOpenMobileNav }) => {
               background: 'var(--bg-elevated)',
               border: '1px solid var(--border-color)',
               color: 'var(--text-main)',
-              width: '40px',
-              height: '40px',
+              width: '44px',
+              height: '44px',
               borderRadius: 'var(--radius-md)',
               display: 'flex',
               alignItems: 'center',
@@ -121,7 +121,7 @@ export const Header = ({ onOpenMobileNav }) => {
               transition: 'all 0.2s ease'
             }}
           >
-            {theme === 'dark' ? <Sun size={19} color="#f59e0b" /> : <Moon size={19} color="#64748b" />}
+            {theme === 'dark' ? <Sun size={20} color="#f59e0b" /> : <Moon size={20} color="#64748b" />}
           </button>
 
           {/* User Auth Section */}
@@ -132,10 +132,11 @@ export const Header = ({ onOpenMobileNav }) => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.5rem',
+                  gap: '0.4rem',
                   background: 'var(--bg-elevated)',
                   border: '1px solid var(--border-color)',
-                  padding: '0.4rem 0.75rem',
+                  minHeight: '44px',
+                  padding: '0.4rem 0.65rem',
                   borderRadius: 'var(--radius-md)',
                   cursor: 'pointer',
                   color: 'var(--text-main)'
@@ -151,12 +152,13 @@ export const Header = ({ onOpenMobileNav }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '0.85rem',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  flexShrink: 0
                 }}>
                   {(userProfile?.displayName || 'ইউ').charAt(0)}
                 </div>
-                <span style={{ fontSize: '0.9rem', fontWeight: '600', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {userProfile?.displayName || 'আমার অ্যাকাউন্ট'}
+                <span style={{ fontSize: '0.85rem', fontWeight: '600', maxWidth: '85px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {userProfile?.displayName || 'অ্যাকাউন্ট'}
                 </span>
               </button>
 
@@ -183,7 +185,7 @@ export const Header = ({ onOpenMobileNav }) => {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.5rem',
-                      padding: '0.5rem 0.75rem',
+                      padding: '0.625rem 0.75rem',
                       borderRadius: 'var(--radius-sm)',
                       color: 'var(--text-main)',
                       fontSize: '0.9rem'
@@ -199,7 +201,7 @@ export const Header = ({ onOpenMobileNav }) => {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.5rem',
-                      padding: '0.5rem 0.75rem',
+                      padding: '0.625rem 0.75rem',
                       borderRadius: 'var(--radius-sm)',
                       color: 'var(--text-main)',
                       fontSize: '0.9rem'
@@ -216,7 +218,7 @@ export const Header = ({ onOpenMobileNav }) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.5rem',
-                        padding: '0.5rem 0.75rem',
+                        padding: '0.625rem 0.75rem',
                         borderRadius: 'var(--radius-sm)',
                         color: 'var(--color-primary-600)',
                         fontWeight: '600',
@@ -235,7 +237,7 @@ export const Header = ({ onOpenMobileNav }) => {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.5rem',
-                      padding: '0.5rem 0.75rem',
+                      padding: '0.625rem 0.75rem',
                       borderRadius: 'var(--radius-sm)',
                       color: 'var(--color-accent-red)',
                       background: 'none',
@@ -256,7 +258,7 @@ export const Header = ({ onOpenMobileNav }) => {
             </Link>
           )}
 
-          {/* Mobile Menu Toggle Button */}
+          {/* Mobile Menu Toggle Button (44px touch area) */}
           <button
             onClick={onOpenMobileNav}
             aria-label="Toggle Mobile Menu"
@@ -265,7 +267,12 @@ export const Header = ({ onOpenMobileNav }) => {
               border: 'none',
               color: 'var(--text-main)',
               cursor: 'pointer',
-              padding: '0.25rem'
+              width: '44px',
+              height: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 'var(--radius-md)'
             }}
             className="mobile-menu-btn"
           >

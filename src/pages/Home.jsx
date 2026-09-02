@@ -106,51 +106,51 @@ export const Home = () => {
   return (
     <div>
       
-      {/* Premium Hero Section */}
+      {/* Responsive Mobile-First Hero Section */}
       <section style={{
         position: 'relative',
-        padding: '4rem 0 3.5rem',
+        padding: 'clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3.5rem)',
         background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(13, 148, 136, 0.05) 100%)',
         borderBottom: '1px solid var(--border-color)',
         overflow: 'hidden'
       }}>
         <div className="container animate-fade-in" style={{ textAlign: 'center', maxWidth: '850px', margin: '0 auto' }}>
           
-          <div className="badge badge-green" style={{ marginBottom: '1.25rem', fontSize: '0.88rem', padding: '0.4rem 1rem' }}>
-            <CheckCircle2 size={16} /> আলমদীপাড়া গ্রামের একমাত্র অফিসিয়াল ডিজিটাল হাব
+          <div className="badge badge-green" style={{ marginBottom: '1rem', fontSize: 'clamp(0.78rem, 2.5vw, 0.88rem)', padding: '0.4rem 0.85rem' }}>
+            <CheckCircle2 size={15} /> আলমদীপাড়া প্রামাণিক ডিজিটাল হাব
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', fontWeight: '800', marginBottom: '1rem', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: 'clamp(1.8rem, 5vw, 3.2rem)', fontWeight: '800', marginBottom: '0.75rem', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
             {siteSettings.heroTitle}
           </h1>
 
-          <p style={{ fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)', color: 'var(--color-primary-700)', fontWeight: '600', marginBottom: '1.25rem' }}>
+          <p style={{ fontSize: 'clamp(1rem, 2.8vw, 1.3rem)', color: 'var(--color-primary-700)', fontWeight: '600', marginBottom: '1rem' }}>
             "{siteSettings.heroSubtitle}"
           </p>
 
-          <p style={{ fontSize: '1.05rem', color: 'var(--text-muted)', lineHeight: '1.7', marginBottom: '2rem' }}>
-            আমাদের গ্রামের কৃষি জমি, প্রাথমিক স্কুল, মসজিদ, খেলার মাঠ, সামাজিক সংগঠন ও সকল প্রয়োজনীয় সেবা এখন এক ক্লিকেই আপনার কাছে।
+          <p style={{ fontSize: 'clamp(0.92rem, 2.2vw, 1.05rem)', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '1.75rem' }}>
+            আমাদের গ্রামের কৃষি জমি, প্রাথমিক স্কুল, মসজিদ, খেলার মাঠ, সামাজিক সংগঠন ও সকল প্রয়োজনীয় সেবা এখন আপনার কাছে।
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
-            <Link to="/map" className="btn btn-primary btn-lg">
-              <MapPin size={20} /> গ্রামের ডিজিটাল মানচিত্র দেখুন
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center' }}>
+            <Link to="/map" className="btn btn-primary btn-lg btn-mobile-full">
+              <MapPin size={20} /> গ্রামের মানচিত্র দেখুন
             </Link>
-            <Link to="/agriculture" className="btn btn-secondary btn-lg">
+            <Link to="/agriculture" className="btn btn-secondary btn-lg btn-mobile-full">
               <Sprout size={20} /> কৃষি সেবা ও জমি লিজ
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Announcements Bar */}
+      {/* Mobile Responsive Announcement Bar */}
       {siteSettings.announcements && siteSettings.announcements.length > 0 && (
-        <section style={{ backgroundColor: 'var(--color-primary-900)', color: '#ffffff', padding: '0.75rem 0' }}>
-          <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: '#ef4444', color: '#fff', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', flexShrink: 0 }}>
-              <Bell size={14} /> ঘোষণা
+        <section style={{ backgroundColor: 'var(--color-primary-900)', color: '#ffffff', padding: '0.65rem 0' }}>
+          <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#ef4444', color: '#fff', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.78rem', fontWeight: 'bold', flexShrink: 0 }}>
+              <Bell size={13} /> ঘোষণা
             </div>
-            <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', fontSize: '0.92rem' }}>
+            <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', fontSize: '0.88rem' }}>
               {siteSettings.announcements.join('  •  ')}
             </div>
           </div>
@@ -158,19 +158,21 @@ export const Home = () => {
       )}
 
       {/* Main 9 Dashboard Module Cards Grid */}
-      <section style={{ padding: '4rem 0' }}>
+      <section style={{ padding: 'clamp(2rem, 5vw, 3.5rem) 0' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-              ডিজিটাল গ্রামের সকল সেবাসমূহ
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '700', marginBottom: '0.4rem' }}>
+              ডিজিটাল গ্রামের সেবাসমূহ
             </h2>
-            <p style={{ color: 'var(--text-muted)' }}>আপনার প্রয়োজনীয় মডিউলে ক্লিক করে বিস্তারিত তথ্য জানুন</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 'clamp(0.88rem, 2.2vw, 1rem)' }}>
+              প্রয়োজনীয় মডিউলে ট্যাপ করে বিস্তারিত তথ্য ও সেবাসমূহ জানুন
+            </p>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '1.5rem'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1.25rem'
           }}>
             {dashboardCards.map((card) => {
               const Icon = card.icon;
@@ -184,29 +186,30 @@ export const Home = () => {
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     height: '100%',
-                    textDecoration: 'none'
+                    textDecoration: 'none',
+                    padding: '1.25rem'
                   }}
                 >
                   <div>
                     <div style={{
-                      width: '52px',
-                      height: '52px',
-                      borderRadius: '14px',
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
                       backgroundColor: `${card.color}15`,
                       color: card.color,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      marginBottom: '1.25rem'
+                      marginBottom: '1rem'
                     }}>
-                      <Icon size={28} />
+                      <Icon size={26} />
                     </div>
                     
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '0.4rem', color: 'var(--text-main)' }}>
                       {card.title}
                     </h3>
                     
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', lineHeight: '1.5', marginBottom: '1.15rem' }}>
                       {card.description}
                     </p>
                   </div>
@@ -217,9 +220,9 @@ export const Home = () => {
                     gap: '0.35rem',
                     color: card.color,
                     fontWeight: '700',
-                    fontSize: '0.9rem'
+                    fontSize: '0.88rem'
                   }}>
-                    প্রবেশ করুন <ArrowRight size={16} />
+                    প্রবেশ করুন <ArrowRight size={15} />
                   </div>
                 </Link>
               );
@@ -229,17 +232,17 @@ export const Home = () => {
       </section>
 
       {/* Interactive Map Preview Section */}
-      <section style={{ padding: '3rem 0 4rem', backgroundColor: 'var(--bg-card)', borderTop: '1px solid var(--border-color)' }}>
+      <section style={{ padding: '2.5rem 0 3.5rem', backgroundColor: 'var(--bg-card)', borderTop: '1px solid var(--border-color)' }}>
         <div className="container">
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', gap: '0.85rem' }}>
             <div>
-              <h2 style={{ fontSize: '1.8rem', fontWeight: '700' }}>আলমদীপাড়া গ্রামের মানচিত্র</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-                বায়তুল নূর ও মামুর মসজিদ, সরকারি প্রাথমিক স্কুল, লাটিয়াকুড়ি, চড়ে বন্দ ও মাগুড়া বন্দ মাঠ
+              <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.8rem)', fontWeight: '700' }}>আলমদীপাড়া গ্রামের মানচিত্র</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                বায়তুল নূর ও মামুর মসজিদ, সরকারি প্রাথমিক স্কুল, লাটিয়াকুড়ি, চড়ে বন্দ ও মাগুড়া বন্দ
               </p>
             </div>
-            <Link to="/map" className="btn btn-secondary">
-              সম্পূর্ণ মানচিত্র মোড <ArrowRight size={16} />
+            <Link to="/map" className="btn btn-secondary btn-sm btn-mobile-full">
+              সম্পূর্ণ মানচিত্র মোড <ArrowRight size={15} />
             </Link>
           </div>
 

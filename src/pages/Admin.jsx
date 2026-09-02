@@ -101,72 +101,80 @@ export const Admin = () => {
   ];
 
   return (
-    <div className="container" style={{ padding: '2.5rem 1.25rem' }}>
+    <div className="container" style={{ padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(0.85rem, 3vw, 1.25rem)' }}>
       
       {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '1.75rem' }}>
         <div className="badge badge-green" style={{ marginBottom: '0.5rem' }}>
           সুপার এডমিন কন্ট্রোল সেন্টার
         </div>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.6rem, 4.5vw, 2.2rem)', fontWeight: '800', marginBottom: '0.4rem' }}>
           আলমদীপাড়া কেন্দ্রীয় এডমিন ড্যাশবোর্ড
         </h1>
-        <p style={{ color: 'var(--text-muted)' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: 'clamp(0.88rem, 2.2vw, 1rem)' }}>
           ব্যবহারকারীদের এডমিন রোল ব্যবস্থাপনা, ওয়েবসাইটের কনফিগারেশন ও এডমিন অডিট ইতিহাস।
         </p>
       </div>
 
-      {/* Admin Tabs */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-        <button onClick={() => setActiveTab('overview')} className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-secondary'}`}>
-          <Shield size={18} /> সারসংক্ষেপ (Overview)
+      {/* Touch Scrollable Admin Tabs */}
+      <div style={{
+        display: 'flex',
+        gap: '0.5rem',
+        marginBottom: '1.75rem',
+        borderBottom: '1px solid var(--border-color)',
+        paddingBottom: '0.5rem',
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch'
+      }}>
+        <button onClick={() => setActiveTab('overview')} className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <Shield size={18} /> সারসংক্ষেপ
         </button>
         {isSuperAdmin && (
-          <button onClick={() => setActiveTab('roles')} className={`btn ${activeTab === 'roles' ? 'btn-primary' : 'btn-secondary'}`}>
-            <Users size={18} /> ব্যবহারকারীদের এডমিন রোল ব্যবস্থাপনা ({userList.length})
+          <button onClick={() => setActiveTab('roles')} className={`btn ${activeTab === 'roles' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <Users size={18} /> রোল ব্যবস্থাপনা ({userList.length})
           </button>
         )}
         {isSuperAdmin && (
-          <button onClick={() => setActiveTab('settings')} className={`btn ${activeTab === 'settings' ? 'btn-primary' : 'btn-secondary'}`}>
+          <button onClick={() => setActiveTab('settings')} className={`btn ${activeTab === 'settings' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
             <Settings size={18} /> সাইট টেক্সট কনফিগারেশন
           </button>
         )}
-        <button onClick={() => setActiveTab('audit')} className={`btn ${activeTab === 'audit' ? 'btn-primary' : 'btn-secondary'}`}>
-          <FileText size={18} /> এডমিন অডিট লগ (Audit Log)
+        <button onClick={() => setActiveTab('audit')} className={`btn ${activeTab === 'audit' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <FileText size={18} /> অডিট লগ (Audit Log)
         </button>
       </div>
 
       {/* Tab 1: Overview Widgets */}
       {activeTab === 'overview' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
-          <div className="card" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.2rem', fontWeight: '800', color: 'var(--color-primary-600)' }}>{userList.length} জন</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>মোট নিবন্ধিত ব্যবহারকারী</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+          <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--color-primary-600)' }}>{userList.length} জন</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>মোট নিবন্ধিত ব্যবহারকারী</div>
           </div>
-          <div className="card" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.2rem', fontWeight: '800', color: 'var(--color-accent-amber)' }}>৩টি</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>প্রধান কৃষি মাঠ (লাটিয়াকুড়ি, চড়ে বন্দ, মাগুড়া বন্দ)</div>
+          <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--color-accent-amber)' }}>৩টি</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>প্রধান কৃষি মাঠ (লাটিয়াকুড়ি, চড়ে বন্দ, মাগুড়া বন্দ)</div>
           </div>
-          <div className="card" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.2rem', fontWeight: '800', color: '#2563eb' }}>২টি</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>মসজিদ (বায়তুল নূর ও মামুর)</div>
+          <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '800', color: '#2563eb' }}>২টি</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>মসজিদ (বায়তুল নূর ও মামুর)</div>
           </div>
-          <div className="card" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.2rem', fontWeight: '800', color: '#7c3aed' }}>১টি</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>সরকারি প্রাথমিক বিদ্যালয়</div>
+          <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '800', color: '#7c3aed' }}>১টি</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>সরকারি প্রাথমিক বিদ্যালয়</div>
           </div>
         </div>
       )}
 
       {/* Tab 2: User Roles Assignment Panel */}
       {activeTab === 'roles' && (
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+        <div className="card" style={{ padding: 'clamp(1rem, 3vw, 1.5rem)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
             <div>
-              <h2 style={{ fontSize: '1.4rem', fontWeight: '700' }}>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: '700' }}>
                 ব্যবহারকারীদের এডমিন রোল ব্যবস্থাপনা
               </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
                 সুপার এডমিন হিসেবে আপনি সমস্ত নিবন্ধিত ব্যবহারকারীদের দেখতে পারবেন এবং তাদের নির্দিষ্ট এডমিন দায়িত্ব অর্পণ করতে পারবেন।
               </p>
             </div>
@@ -176,27 +184,27 @@ export const Admin = () => {
           </div>
 
           {loadingUsers ? (
-            <div style={{ padding: '3rem', textAlign: 'center' }}>
+            <div style={{ padding: '2.5rem', textAlign: 'center' }}>
               <Loader2 size={32} className="animate-spin" style={{ margin: '0 auto 0.5rem', color: 'var(--color-primary-600)' }} />
-              <div>ব্যবহারকারীদের তালিকা লোড হচ্ছে...</div>
+              <div style={{ fontSize: '0.9rem' }}>ব্যবহারকারীদের তালিকা লোড হচ্ছে...</div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {userList.map(u => (
-                <div key={u.uid || u.id} style={{ padding: '1.25rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                <div key={u.uid || u.id} style={{ padding: '1rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
                   
                   {/* User Info Line */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.85rem' }}>
                     <div>
-                      <div style={{ fontWeight: '700', fontSize: '1.1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <UserCheck size={18} color="var(--color-primary-600)" /> {u.displayName || 'নাম প্রদান করা হয়নি'}
+                      <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <UserCheck size={16} color="var(--color-primary-600)" /> {u.displayName || 'নাম প্রদান করা হয়নি'}
                       </div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                         ইমেইল: {u.email} {u.phone ? `| ফোন: ${u.phone}` : ''}
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                       {(!u.roles || u.roles.length === 0) && (
                         <span className="badge badge-amber">সাধারণ গ্রামবাসী</span>
                       )}
@@ -209,12 +217,12 @@ export const Admin = () => {
                   </div>
 
                   {/* Role Assignment Buttons */}
-                  <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                  <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.65rem' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
                       রোল পরিবর্তন / ক্লিক করে অর্পণ বা অপসারণ করুন:
                     </div>
 
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
                       {availableRoles.map(role => {
                         const isAssigned = (u.roles || []).includes(role.key);
                         return (
@@ -222,15 +230,16 @@ export const Admin = () => {
                             key={role.key}
                             onClick={() => handleToggleUserRole(u, role.key)}
                             style={{
-                              padding: '0.35rem 0.75rem',
+                              padding: '0.35rem 0.65rem',
                               borderRadius: 'var(--radius-md)',
-                              fontSize: '0.82rem',
+                              fontSize: '0.78rem',
                               fontWeight: '600',
                               cursor: 'pointer',
                               border: isAssigned ? '1px solid transparent' : '1px solid var(--border-color)',
                               backgroundColor: isAssigned ? role.color : 'var(--bg-card)',
                               color: isAssigned ? '#ffffff' : 'var(--text-main)',
-                              transition: 'all 0.2s ease'
+                              transition: 'all 0.2s ease',
+                              minHeight: '36px'
                             }}
                           >
                             {isAssigned ? `✓ ${role.label}` : `+ ${role.label}`}
@@ -249,8 +258,8 @@ export const Admin = () => {
 
       {/* Tab 3: Site Text Configuration */}
       {activeTab === 'settings' && (
-        <div className="card" style={{ maxWidth: '700px' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '1rem' }}>
+        <div className="card" style={{ maxWidth: '700px', padding: 'clamp(1rem, 3vw, 1.5rem)' }}>
+          <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '1rem' }}>
             হোমপেজ ও সাইট হেডার টেক্সট কনফিগারেশন
           </h2>
 
@@ -275,7 +284,7 @@ export const Admin = () => {
               <input type="text" className="form-input" value={siteSettings.slogan} onChange={e => setSiteSettings({...siteSettings, slogan: e.target.value})} />
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>
+            <button type="submit" className="btn btn-primary btn-mobile-full" style={{ marginTop: '1rem' }}>
               পরিবর্তনগুলো সেভ করুন
             </button>
           </form>
@@ -284,28 +293,28 @@ export const Admin = () => {
 
       {/* Tab 4: Audit Logs */}
       {activeTab === 'audit' && (
-        <div className="card">
-          <h2 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '1rem' }}>
+        <div className="card" style={{ padding: 'clamp(1rem, 3vw, 1.5rem)' }}>
+          <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '1rem' }}>
             এডমিন অ্যাকশন অডিট লগ (System Audit Trail)
           </h2>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+          <div className="table-responsive">
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid var(--border-color)', backgroundColor: 'var(--bg-elevated)' }}>
-                  <th style={{ padding: '0.75rem' }}>সময়</th>
-                  <th style={{ padding: '0.75rem' }}>এডমিন</th>
-                  <th style={{ padding: '0.75rem' }}>অ্যাকশন</th>
-                  <th style={{ padding: '0.75rem' }}>বিবরণ</th>
+                  <th style={{ padding: '0.65rem' }}>সময়</th>
+                  <th style={{ padding: '0.65rem' }}>এডমিন</th>
+                  <th style={{ padding: '0.65rem' }}>অ্যাকশন</th>
+                  <th style={{ padding: '0.65rem' }}>বিবরণ</th>
                 </tr>
               </thead>
               <tbody>
                 {auditLogs.map(log => (
                   <tr key={log.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>{log.timestamp}</td>
-                    <td style={{ padding: '0.75rem', fontWeight: 'bold' }}>{log.adminName}</td>
-                    <td style={{ padding: '0.75rem' }}><span className="badge badge-blue">{log.action}</span></td>
-                    <td style={{ padding: '0.75rem' }}>{log.targetDoc}</td>
+                    <td style={{ padding: '0.65rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{log.timestamp}</td>
+                    <td style={{ padding: '0.65rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{log.adminName}</td>
+                    <td style={{ padding: '0.65rem' }}><span className="badge badge-blue">{log.action}</span></td>
+                    <td style={{ padding: '0.65rem' }}>{log.targetDoc}</td>
                   </tr>
                 ))}
               </tbody>

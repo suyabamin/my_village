@@ -5,6 +5,8 @@ import { useNotification } from '../context/NotificationContext';
 import { LayoutDashboard, Wrench, FileText, Shield, Trash2, Plus } from 'lucide-react';
 import { initialVillageData } from '../services/dbService';
 
+import VillageCommonImageSlider from '../components/village/VillageCommonImageSlider';
+
 export const Dashboard = () => {
   const { userProfile, switchDemoRole } = useAuth();
   const { addToast } = useNotification();
@@ -48,6 +50,9 @@ export const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Feature A: Village Common Image Slider (Dynamic & Unlimited) */}
+      <VillageCommonImageSlider />
 
       {/* Dev Demo Role Selector Bar */}
       <div className="card" style={{ marginBottom: '1.5rem', padding: '0.85rem', backgroundColor: 'var(--bg-elevated)' }}>

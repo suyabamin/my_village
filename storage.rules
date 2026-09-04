@@ -24,5 +24,10 @@ service firebase.storage {
       allow read: if true;
       allow write: if isSignedIn() && isImageOrPdf() && isWithinSizeLimit();
     }
+    
+    match /village_common_images/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImageOrPdf() && isWithinSizeLimit();
+    }
   }
 }

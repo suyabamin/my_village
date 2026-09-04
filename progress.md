@@ -12,11 +12,44 @@
 - **Phase 8 — Super Admin & Role Management**: ✅ Completed
 - **Phase 9 — Performance & Optimization**: ✅ Completed
 - **Phase 10 — Mobile-First Responsive UI Optimization**: ✅ Completed (`npm run build` verified)
+- **Phase 11 — Village Common Image Slider + Profile Picture**: ✅ Completed
 
-## Completed Deliverables
-1. `SKILL.md` activated and verified as the project master rulebook.
-2. Mobile-first CSS design system in [index.css](file:///d:/my%20village_web/src/styles/index.css) with fluid typography (`clamp()`), touch target sizes (min 44px), and touch press feedback.
-3. Mobile Bottom Navigation Bar ([`MobileBottomBar.jsx`](file:///d:/my%20village_web/src/components/layout/MobileBottomBar.jsx)) for instant access to Home, Map, Agriculture, Sports, and Emergency on mobile screens.
-4. Mobile-responsive Interactive Village Map with scrollable touch category chips and responsive viewport height.
-5. Touch-friendly modal forms (`width: min(540px, 94vw)`) and single-column mobile input layouts.
-6. 100% Preservation of all Firebase fetchers, Cloud Firestore queries, Auth logic, and backend services.
+## Public Village Image Auto Slider ("আমাদের আলমদীপাড়া")
+
+### Completed
+- Added public village image slider directly under "আমাদের আলমদীপাড়া" heading on the main public website Home page (`Home.jsx`) & Dashboard (`Dashboard.jsx`).
+- Added dynamic Cloud Firestore fetching from `village_common_images` collection.
+- Added unlimited logical image support (no hard-coded max limit).
+- Added automatic continuous slideshow with exact 1.5-second (1500ms) image rotation.
+- Added smooth crossfade transitions and touch-swipe support for mobile viewports.
+- Added Super Admin image management (Add, Edit, Delete with safety modal, Reorder, Active/Inactive control) under Super Admin Dashboard (`Admin.jsx`).
+- Added Firebase Storage integration and Cloud Firestore security rules.
+- Fully public access (viewable by guests, logged-in users, normal users, and admins without login restriction).
+- Added image add/edit/delete
+- Added image ordering
+- Added active/inactive control
+- Added Firebase Storage integration for village images
+- Added user profile picture upload
+- Added profile picture change
+- Added profile picture delete
+- Added default avatar
+- Added mobile-responsive profile image UI
+
+### Fetcher Protection
+- Existing fetchers were NOT modified.
+- Existing Firebase queries were NOT modified.
+- Existing backend/data logic was preserved.
+
+### New Fetchers
+- Added isolated village image fetchers/services (`villageCommonImageService.js`)
+- Added isolated profile image upload/delete functionality (`profileImageService.js`)
+
+### Testing
+- Mobile (320px - 480px)
+- Tablet
+- Desktop
+- Light mode
+- Dark mode
+- Firebase permissions
+- Upload/delete/edit flows
+

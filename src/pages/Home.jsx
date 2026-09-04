@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { getCollectionData, initialVillageData } from '../services/dbService';
 import { VillageMap } from '../components/map/VillageMap';
+import VillageCommonImageSlider from '../components/village/VillageCommonImageSlider';
 
 export const Home = () => {
   const [siteSettings, setSiteSettings] = useState(initialVillageData.site_settings);
@@ -128,11 +129,14 @@ export const Home = () => {
             "{siteSettings.heroSubtitle}"
           </p>
 
-          <p style={{ fontSize: 'clamp(0.92rem, 2.2vw, 1.05rem)', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '1.75rem' }}>
+          <p style={{ fontSize: 'clamp(0.92rem, 2.2vw, 1.05rem)', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '1.25rem' }}>
             আমাদের গ্রামের কৃষি জমি, প্রাথমিক স্কুল, মসজিদ, খেলার মাঠ, সামাজিক সংগঠন ও সকল প্রয়োজনীয় সেবা এখন আপনার কাছে।
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center' }}>
+          {/* 🖼️ PUBLIC VILLAGE IMAGE AUTO SLIDER UNDER "আমাদের আলমদীপাড়া" */}
+          <VillageCommonImageSlider />
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center', marginTop: '1.75rem' }}>
             <Link to="/map" className="btn btn-primary btn-lg btn-mobile-full">
               <MapPin size={20} /> গ্রামের মানচিত্র দেখুন
             </Link>

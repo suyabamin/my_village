@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { Shield, Users, Settings, FileText, CheckCircle2, Loader2, UserCheck } from 'lucide-react';
+import { Shield, Users, Settings, FileText, CheckCircle2, Loader2, UserCheck, Image as ImageIcon } from 'lucide-react';
 import { getCollectionData, updateDocument, initialVillageData } from '../services/dbService';
+import VillageImageAdminManager from '../components/village/VillageImageAdminManager';
 
 export const Admin = () => {
-  const { isSuperAdmin } = useAuth();
+  const { isSuperAdmin, currentUser } = useAuth();
   const { addToast } = useNotification();
 
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roles' | 'settings' | 'audit'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roles' | 'settings' | 'village_images' | 'audit'
 
   // Configurable Site Settings
   const [siteSettings, setSiteSettings] = useState(initialVillageData.site_settings);
@@ -135,6 +136,11 @@ export const Admin = () => {
           </button>
         )}
         {isSuperAdmin && (
+          <button onClick={() => setActiveTab('village_images')} className={`btn ${activeTab === 'village_images' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <ImageIcon size={18} /> গ্রামের ছবি
+          </button>
+        )}
+        {isSuperAdmin && (
           <button onClick={() => setActiveTab('settings')} className={`btn ${activeTab === 'settings' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
             <Settings size={18} /> সাইট টেক্সট কনফিগারেশন
           </button>
@@ -254,6 +260,11 @@ export const Admin = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Tab 2.5: Village Common Images Manager (Super Admin) */}
+      {activeTab === 'village_images' && (
+        <VillageImageAdminManager currentUser={currentUser} />
       )}
 
       {/* Tab 3: Site Text Configuration */}

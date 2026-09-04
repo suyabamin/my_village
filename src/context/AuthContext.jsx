@@ -169,6 +169,17 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('alamdipara_demo_user', JSON.stringify(updated));
   };
 
+  // Helper to update local user profile state in real-time (e.g. photoURL update)
+  const updateUserProfileState = (updatedFields) => {
+    setUserProfile(prev => {
+      const updated = { ...prev, ...updatedFields };
+      if (!isLiveFirebaseConfigured) {
+        localStorage.setItem('alamdipara_demo_user', JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
   const value = {
     currentUser,
     userProfile,
@@ -179,6 +190,7 @@ export const AuthProvider = ({ children }) => {
     resetPassword,
     hasRole,
     switchDemoRole,
+    updateUserProfileState,
     isSuperAdmin: hasRole('super_admin')
   };
 

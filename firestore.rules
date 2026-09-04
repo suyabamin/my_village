@@ -38,6 +38,12 @@ service cloud.firestore {
       allow write: if isSuperAdmin();
     }
     
+    // Village Common Images
+    match /village_common_images/{imageId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    
     // Map Locations
     match /map_locations/{locId} {
       allow read: if true;

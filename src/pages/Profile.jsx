@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { User, Phone, Mail, Shield, Save } from 'lucide-react';
+import ProfileAvatar from '../components/profile/ProfileAvatar';
+import ProfileImageUploader from '../components/profile/ProfileImageUploader';
 
 export const Profile = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, currentUser, updateUserProfileState } = useAuth();
   const { addToast } = useNotification();
 
   const [displayName, setDisplayName] = useState(userProfile?.displayName || '');
@@ -13,7 +15,19 @@ export const Profile = () => {
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
+    if (updateUserProfileState) {
+      updateUserProfileState({ displayName, phone, bio });
+    }
     addToast('প্রোফাইল তথ্য সফলভাবে আপডেট হয়েছে!', 'success');
+  };
+
+  const handleProfilePhotoUpdated = (newPhotoUrl) => {
+    if (updateUserProfileState) {
+      updateUserProfileState({ 
+        photoURL: newPhotoUrl, 
+        profilePic: newPhotoUrl 
+      });
+    }
   };
 
   return (
@@ -23,25 +37,16 @@ export const Profile = () => {
           আমার প্রোফাইল
         </h1>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', padding: '1rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--color-primary-600)',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.8rem',
-            fontWeight: 'bold'
-          }}>
-            {(userProfile?.displayName || 'ইউ').charAt(0)}
-          </div>
+        {/* User Card with Profile Avatar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
+          <ProfileAvatar 
+            user={userProfile || currentUser} 
+            size={64} 
+          />
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>{userProfile?.displayName}</h2>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{userProfile?.email}</div>
-            <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', margin: 0 }}>{userProfile?.displayName || 'গ্রামবাসী'}</h2>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '2px' }}>{userProfile?.email}</div>
+            <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
               {userProfile?.roles?.map(r => (
                 <span key={r} className="badge badge-green">{r}</span>
               ))}
@@ -49,7 +54,13 @@ export const Profile = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSaveProfile}>
+        {/* Feature B: Profile Picture Upload / Change / Remove Component */}
+        <ProfileImageUploader 
+          currentUser={userProfile || currentUser}
+          onProfileUpdated={handleProfilePhotoUpdated}
+        />
+
+        <form onSubmit={handleSaveProfile} style={{ marginTop: '1.5rem' }}>
           <div className="form-group">
             <label className="form-label">পূর্ণ নাম</label>
             <input type="text" className="form-input" value={displayName} onChange={e => setDisplayName(e.target.value)} />

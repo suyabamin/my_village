@@ -14,7 +14,8 @@ import {
   User, 
   LayoutDashboard, 
   LogOut,
-  Sparkles
+  Sparkles,
+  CloudSun
 } from 'lucide-react';
 
 export const MobileNav = ({ isOpen, onClose }) => {
@@ -27,6 +28,7 @@ export const MobileNav = ({ isOpen, onClose }) => {
     { label: 'হোম', path: '/', icon: Home },
     { label: 'ডিজিটাল মানচিত্র', path: '/map', icon: MapPin },
     { label: 'কৃষি সেবা ও মাঠ', path: '/agriculture', icon: Sprout },
+    { label: 'আবহাওয়া পূর্বাভাস', path: '/weather', icon: CloudSun },
     { label: 'খেলাধুলা ও টুর্নামেন্ট', path: '/sports', icon: Trophy },
     { label: 'শিক্ষা প্রতিষ্ঠান', path: '/education', icon: GraduationCap },
     { label: 'বায়তুল নূর ও বায়তুল মামুর মসজিদ', path: '/mosques', icon: Building2 },

@@ -15,7 +15,8 @@ import {
   Building2, 
   ShieldAlert, 
   Users,
-  LayoutDashboard
+  LayoutDashboard,
+  CloudSun
 } from 'lucide-react';
 
 import ProfileAvatar from '../profile/ProfileAvatar';
@@ -37,6 +38,7 @@ export const Header = ({ onOpenMobileNav }) => {
     { label: 'হোম', path: '/' },
     { label: 'মানচিত্র', path: '/map', icon: MapPin },
     { label: 'কৃষি', path: '/agriculture', icon: Sprout },
+    { label: 'আবহাওয়া', path: '/weather', icon: CloudSun },
     { label: 'খেলাধুলা', path: '/sports', icon: Trophy },
     { label: 'শিক্ষা', path: '/education', icon: GraduationCap },
     { label: 'মসজিদ', path: '/mosques', icon: Building2 },

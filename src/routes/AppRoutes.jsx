@@ -20,6 +20,7 @@ const Culture = lazy(() => import('../pages/Culture').then(m => ({ default: m.Cu
 const Social = lazy(() => import('../pages/Social').then(m => ({ default: m.Social })));
 const Emergency = lazy(() => import('../pages/Emergency').then(m => ({ default: m.Emergency })));
 const ReligiousEvents = lazy(() => import('../pages/ReligiousEvents').then(m => ({ default: m.ReligiousEvents })));
+const WeatherPage = lazy(() => import('../pages/WeatherPage'));
 const Login = lazy(() => import('../pages/Login').then(m => ({ default: m.Login })));
 const Register = lazy(() => import('../pages/Register').then(m => ({ default: m.Register })));
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
@@ -53,6 +54,7 @@ export const AppRoutes = () => {
           <Route path="social" element={<Social />} />
           <Route path="emergency" element={<Emergency />} />
           <Route path="religious-events" element={<ReligiousEvents />} />
+          <Route path="weather" element={<WeatherPage />} />
           
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />

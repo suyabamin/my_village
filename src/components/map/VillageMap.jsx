@@ -20,21 +20,21 @@ import {
   X
 } from 'lucide-react';
 
-// Default Alamdipara Geographic Center & Zoom
-const DEFAULT_CENTER = [24.1250, 89.2360];
+// Default Alamdipara Geographic Center & Zoom (From Google Maps: https://maps.app.goo.gl/pZt3kjTtQ2wA2FvN8)
+const DEFAULT_CENTER = [24.397140, 90.858307];
 const DEFAULT_ZOOM = 15;
 
-// Verified Agricultural Field Polygons (Centered around exact known coordinates)
+// Verified Agricultural Field Polygons (Centered around Alamdipara Village location)
 const AGRI_POLYGONS = [
   {
     id: "poly-latiyakuri",
     name: "লাটিয়াকুড়ি কৃষি মাঠ",
-    center: [24.1210, 89.2310],
+    center: [24.3940, 90.8540],
     polygon: [
-      [24.1228, 89.2290],
-      [24.1235, 89.2330],
-      [24.1195, 89.2335],
-      [24.1190, 89.2295]
+      [24.3958, 90.8520],
+      [24.3965, 90.8560],
+      [24.3925, 90.8565],
+      [24.3920, 90.8525]
     ],
     crop: "ধান, গম, সরিষা ও রবি শস্য",
     water: "ডিপ টিউবওয়েল ও সেচ ক্যানাল"
@@ -42,12 +42,12 @@ const AGRI_POLYGONS = [
   {
     id: "poly-chore-bondo",
     name: "চড়ে বন্দ কৃষি মাঠ",
-    center: [24.1295, 89.2420],
+    center: [24.4010, 90.8620],
     polygon: [
-      [24.1310, 89.2395],
-      [24.1315, 89.2440],
-      [24.1280, 89.2445],
-      [24.1275, 89.2400]
+      [24.4025, 90.8595],
+      [24.4030, 90.8640],
+      [24.3995, 90.8645],
+      [24.3990, 90.8600]
     ],
     crop: "বোরো ধান ও ভুট্টা চাষ এলাকা",
     water: "ক্যানাল সেচ প্রক্রিয়া"
@@ -55,12 +55,12 @@ const AGRI_POLYGONS = [
   {
     id: "poly-magura-bondo",
     name: "মাগুড়া বন্দ কৃষি মাঠ",
-    center: [24.1180, 89.2280],
+    center: [24.3910, 90.8510],
     polygon: [
-      [24.1198, 89.2260],
-      [24.1202, 89.2300],
-      [24.1165, 89.2305],
-      [24.1160, 89.2265]
+      [24.3928, 90.8490],
+      [24.3932, 90.8530],
+      [24.3895, 90.8535],
+      [24.3890, 90.8495]
     ],
     crop: "শাকসবজি ও পাট প্রধান এলাকা",
     water: "সৌরবিদ্যুৎ সেচ পাম্প"
@@ -619,6 +619,46 @@ export const VillageMap = ({ locations = [], onSelectLocation, isAdmin, onAddLoc
               </Marker>
             </>
           )}
+
+          {/* Village Center Pin Marker (From Google Maps Link: 24.397140, 90.858307) */}
+          <Marker
+            position={DEFAULT_CENTER}
+            icon={createCustomMarkerIcon('other', activeLocationId === 'village-center', true, 'আলমদীপাড়া (কেন্দ্রীয় অবস্থান)')}
+            eventHandlers={{
+              click: () => {
+                setMapCenter(DEFAULT_CENTER);
+                setActiveLocationId('village-center');
+              }
+            }}
+          >
+            <Popup maxWidth={300} minWidth={260}>
+              <div style={styles.popupCard}>
+                <div style={styles.popupContent}>
+                  <span style={{
+                    ...styles.popupBadgeInline,
+                    backgroundColor: '#dcfce7',
+                    color: '#15803d'
+                  }}>
+                    🏡 কেন্দ্রীয় অবস্থান
+                  </span>
+                  <h4 style={styles.popupTitle}>আলমদীপাড়া (কেন্দ্রীয় এলাকা)</h4>
+                  <p style={styles.popupDesc}>
+                    আমাদের প্রিয় আলমদীপাড়া গ্রাম — তথ্য, সেবা ও ঐতিহ্যে একটি আধুনিক ডিজিটাল গ্রাম।
+                  </p>
+                  <a
+                    href="https://maps.app.goo.gl/pZt3kjTtQ2wA2FvN8"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.directionsBtn}
+                  >
+                    <Navigation size={13} />
+                    <span>Google Maps এ সরাসরি দেখুন</span>
+                    <ExternalLink size={11} style={{ marginLeft: 'auto' }} />
+                  </a>
+                </div>
+              </div>
+            </Popup>
+          </Marker>
 
           {/* Map Location Markers */}
           {filteredLocations.map(loc => {

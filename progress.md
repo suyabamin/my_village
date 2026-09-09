@@ -15,109 +15,51 @@
 - **Phase 11 — Village Common Image Slider + Profile Picture**: ✅ Completed
 - **Phase 12 — Realistic Village Map UI Improvement**: ✅ Completed
 - **Phase 13 — Modern Weather System**: ✅ Completed (`npm run build` verified)
+- **Phase 14 — "খেলাধুলা" Complete Tournament, Team Registration, Fixture, Live Score & Live Streaming System**: ✅ Completed (`npm run build` verified)
 
-## Modern Weather System
+---
 
-Completed:
-- Added isolated weather fetcher
-- Added fixed village weather location
-- Added current weather
-- Added hourly forecast
-- Added daily forecast
-- Added weather details
-- Added precipitation information
-- Added humidity
-- Added wind information
-- Added sunrise/sunset
-- Added UV information where supported
-- Added air quality where supported
-- Added weather alerts where supported
-- Added temperature visualization
-- Added automatic refresh
-- Added manual refresh
-- Added loading state
-- Added error handling
-- Added responsive mobile UI
-- Added desktop UI
-- Added dark mode
+## Phase 14 — "খেলাধুলা" Complete Sports, Team Registration, Fixture, Live Score & Live Streaming System
 
-Location:
-- Weather is permanently configured for the specified Google Maps location.
+### Completed Features:
+1. **Fetcher Protection**:
+   - 🔴 **Zero Existing Fetchers Modified**: All fetchers in `dbService.js`, `imageService.js`, `villageCommonImageService.js`, `weatherService.js` were preserved with 100% backward compatibility.
+   - Isolated new sports operations placed in `src/services/sportsService.js`.
 
-Fetcher Protection:
-- Existing fetchers were NOT modified.
-- Existing map fetcher was NOT modified.
-- Existing Firebase fetchers were NOT modified.
-- Existing data-fetching logic was preserved.
+2. **Tournament Creation & Approval System**:
+   - Any authenticated user can create tournaments.
+   - Separate rule system for Football vs Cricket (configurable squad size, team count, venue, rules, prizes, logo/poster client-side compression upload).
+   - Created tournaments default to `pending` status.
+   - `super_admin` & `game_admin` approval panel in `Admin.jsx` to approve/reject pending tournaments with feedback reasons.
 
-New Fetcher:
-- Added isolated weather fetcher/service.
+3. **Team Registration & Player Photo Uploads**:
+   - Any user can register teams in approved tournaments.
+   - Dynamic player roster input with client-side WebP photo uploads (`uploadFreeImage`).
+   - Registration status `pending` until approved by Tournament Creator/Owner.
+   - PDF official registration receipt download (`html2pdf.js`).
 
-## Realistic Village Map UI Improvement
+4. **Tournament Owner Management Dashboard (`TournamentManagement.jsx`)**:
+   - Review & Approve/Reject pending team registrations.
+   - View player roster & photos.
+   - Automated Knockout / League fixture generator + manual match assignment.
+   - Dedicated Football & Cricket live scoring controllers.
+   - Mobile camera live stream broadcaster.
 
-Completed:
-- Improved map visual presentation
-- Improved map controls
-- Improved marker design
-- Improved popup UI
-- Improved responsive behavior
-- Improved mobile touch interaction
-- Improved map container design
-- Added/Improved category-based marker visualization
-- Added/Improved clustering where required
-- Added scale control where appropriate
-- Added/reset village map view where supported
-- Improved map labels and usability
+5. **Football & Cricket Live Scoring Engines**:
+   - **Football**: Home/Away goals, scorers & assists, timer (start, pause, 1st half, 2nd half, extra time, penalty shootout), yellow & red cards, timeline log.
+   - **Cricket**: Runs (0,1,2,3,4,6), wickets (bowled, caught, run out, lbw, etc.), extras (wide, no-ball, bye), overs logic (e.g. 12.4 overs -> 13.0 after 6 balls), striker/non-striker & bowler figures, CRR, RRR, Target, Innings 1 -> Innings 2 transition.
 
-Fetcher Protection:
-- Existing map fetcher was NOT modified.
-- Existing map data-fetching logic was NOT modified.
-- Existing Firebase queries were NOT modified.
-- Existing location data structure was preserved.
+6. **Mobile Camera Live Streaming & Video Player**:
+   - Tournament owner broadcasts match using mobile phone camera (`navigator.mediaDevices.getUserMedia`) or YouTube/external stream link.
+   - Multi-camera angle switcher (Camera 1: Main Field, Camera 2: Side Line, Camera 3: Scoreboard).
+   - Responsive public viewer (`LiveStreamPlayer.jsx`) with 🔴 LIVE pulsing badge, fullscreen, volume control, and network error handling.
+   - Accessible to all website visitors without login requirement.
 
-Testing:
-- Mobile
-- Tablet
-- Desktop
-- Light mode
-- Dark mode
+7. **Main Website Dashboard & Home Integration**:
+   - Added 🔴 LIVE MATCHES widget to `Home.jsx` hero and `Dashboard.jsx` showcasing active matches and quick "লাইভ দেখুন" buttons.
 
-## Public Village Image Auto Slider ("আমাদের আলমদীপাড়া")
+8. **Security Rules (`firestore.rules`)**:
+   - Server-side authorization rules updated for `tournaments`, `tournament_registrations`, `teams`, `matches`, `live_scores`, `live_streams`, `tournament_notifications`.
 
-### Completed
-- Added public village image slider directly under "আমাদের আলমদীপাড়া" heading on the main public website Home page (`Home.jsx`) & Dashboard (`Dashboard.jsx`).
-- Added dynamic Cloud Firestore fetching from `village_common_images` collection.
-- Added unlimited logical image support (no hard-coded max limit).
-- Added automatic continuous slideshow with exact 1.5-second (1500ms) image rotation.
-- Added smooth crossfade transitions and touch-swipe support for mobile viewports.
-- Added Super Admin image management (Add, Edit, Delete with safety modal, Reorder, Active/Inactive control) under Super Admin Dashboard (`Admin.jsx`).
-- Added Firebase Storage integration and Cloud Firestore security rules.
-- Fully public access (viewable by guests, logged-in users, normal users, and admins without login restriction).
-- Added image add/edit/delete
-- Added image ordering
-- Added active/inactive control
-- Added Firebase Storage integration for village images
-- Added user profile picture upload
-- Added profile picture change
-- Added profile picture delete
-- Added default avatar
-- Added mobile-responsive profile image UI
-
-### Fetcher Protection
-- Existing fetchers were NOT modified.
-- Existing Firebase queries were NOT modified.
-- Existing backend/data logic was preserved.
-
-### New Fetchers
-- Added isolated village image fetchers/services (`villageCommonImageService.js`)
-- Added isolated profile image upload/delete functionality (`profileImageService.js`)
-
-### Testing
-- Mobile (320px - 480px)
-- Tablet
-- Desktop
-- Light mode
-- Dark mode
-- Firebase permissions
-- Upload/delete/edit flows
-
+9. **Verification**:
+   - Verified clean production build using `npm run build`.

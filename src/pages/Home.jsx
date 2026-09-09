@@ -13,20 +13,30 @@ import {
   MapPin, 
   ArrowRight,
   Bell,
-  CheckCircle2
+  CheckCircle2,
+  Tv,
+  Radio
 } from 'lucide-react';
 import { getCollectionData, initialVillageData } from '../services/dbService';
+import { subscribeLiveMatches } from '../services/sportsService';
 import { VillageMap } from '../components/map/VillageMap';
 import VillageCommonImageSlider from '../components/village/VillageCommonImageSlider';
 
 export const Home = () => {
   const [siteSettings, setSiteSettings] = useState(initialVillageData.site_settings);
   const [mapLocations, setMapLocations] = useState(initialVillageData.map_locations);
+  const [liveMatches, setLiveMatches] = useState([]);
 
   useEffect(() => {
     getCollectionData('map_locations').then(res => {
       if (res && res.length > 0) setMapLocations(res);
     });
+
+    const unSubMatches = subscribeLiveMatches((list) => {
+      setLiveMatches(list);
+    });
+
+    return () => unSubMatches();
   }, []);
 
   const dashboardCards = [
@@ -133,6 +143,21 @@ export const Home = () => {
             আমাদের গ্রামের কৃষি জমি, প্রাথমিক স্কুল, মসজিদ, খেলার মাঠ, সামাজিক সংগঠন ও সকল প্রয়োজনীয় সেবা এখন আপনার কাছে।
           </p>
 
+          {/* 🔴 Live Match Quick Alert on Home Page if active */}
+          {liveMatches.length > 0 && (
+            <div style={{ backgroundColor: '#fee2e2', border: '1px solid #fca5a5', padding: '0.85rem 1.25rem', borderRadius: '12px', marginBottom: '1.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <span className="badge badge-red" style={{ backgroundColor: '#dc2626', color: '#fff' }}>
+                <Radio size={14} style={{ animation: 'pulse 1.5s infinite' }} /> 🔴 লাইভ ম্যাচ সচল
+              </span>
+              <span style={{ fontWeight: '700', color: '#991b1b', fontSize: '0.9rem' }}>
+                {liveMatches[0].teamA} VS {liveMatches[0].teamB}
+              </span>
+              <Link to={`/match/${liveMatches[0].id}`} className="btn btn-primary btn-sm" style={{ backgroundColor: '#dc2626', borderColor: '#dc2626' }}>
+                <Tv size={14} /> সরাসরি ভিডিও ও লাইভ স্কোর দেখুন
+              </Link>
+            </div>
+          )}
+
           {/* 🖼️ PUBLIC VILLAGE IMAGE AUTO SLIDER UNDER "আমাদের আলমদীপাড়া" */}
           <VillageCommonImageSlider />
 
@@ -203,7 +228,7 @@ export const Home = () => {
                       color: card.color,
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
+                      justify: 'center',
                       marginBottom: '1rem'
                     }}>
                       <Icon size={26} />

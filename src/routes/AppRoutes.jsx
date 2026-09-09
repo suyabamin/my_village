@@ -11,6 +11,8 @@ const Agriculture = lazy(() => import('../pages/Agriculture').then(m => ({ defau
 const FieldDetail = lazy(() => import('../pages/FieldDetail').then(m => ({ default: m.FieldDetail })));
 const Sports = lazy(() => import('../pages/Sports').then(m => ({ default: m.Sports })));
 const TournamentDetail = lazy(() => import('../pages/TournamentDetail').then(m => ({ default: m.TournamentDetail })));
+const TournamentManagement = lazy(() => import('../pages/TournamentManagement').then(m => ({ default: m.TournamentManagement })));
+const LiveMatchPage = lazy(() => import('../pages/LiveMatchPage').then(m => ({ default: m.LiveMatchPage })));
 const Education = lazy(() => import('../pages/Education').then(m => ({ default: m.Education })));
 const InstitutionDetail = lazy(() => import('../pages/InstitutionDetail').then(m => ({ default: m.InstitutionDetail })));
 const Mosques = lazy(() => import('../pages/Mosques').then(m => ({ default: m.Mosques })));
@@ -45,6 +47,15 @@ export const AppRoutes = () => {
           <Route path="agriculture/:fieldId" element={<FieldDetail />} />
           <Route path="sports" element={<Sports />} />
           <Route path="tournament/:id" element={<TournamentDetail />} />
+          <Route 
+            path="tournament/:id/manage" 
+            element={
+              <ProtectedRoute>
+                <TournamentManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="match/:id" element={<LiveMatchPage />} />
           <Route path="education" element={<Education />} />
           <Route path="education/:id" element={<InstitutionDetail />} />
           <Route path="mosques" element={<Mosques />} />

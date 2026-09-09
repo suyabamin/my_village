@@ -1,19 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { LayoutDashboard, Wrench, FileText, Shield, Trash2, Plus } from 'lucide-react';
+import { LayoutDashboard, Wrench, FileText, Shield, Trash2, Plus, Trophy, Tv, Radio } from 'lucide-react';
 import { initialVillageData } from '../services/dbService';
+import { subscribeLiveMatches, getTournaments } from '../services/sportsService';
 
 import VillageCommonImageSlider from '../components/village/VillageCommonImageSlider';
 
 export const Dashboard = () => {
-  const { userProfile, switchDemoRole } = useAuth();
+  const { currentUser, userProfile, switchDemoRole } = useAuth();
   const { addToast } = useNotification();
 
   const [myMachines, setMyMachines] = useState(initialVillageData.agricultural_machines);
   const [myLeases, setMyLeases] = useState(initialVillageData.land_leases);
   const [deleteModalItem, setDeleteModalItem] = useState(null);
+  const [liveMatches, setLiveMatches] = useState([]);
+  const [myTournaments, setMyTournaments] = useState([]);
+
+  useEffect(() => {
+    // Subscribe to live matches
+    const unSubMatches = subscribeLiveMatches((mList) => {
+      setLiveMatches(mList);
+    });
+
+    if (currentUser) {
+      getTournaments().then(all => {
+        const userT = all.filter(t => t.createdBy === currentUser.uid);
+        setMyTournaments(userT);
+      });
+    }
+
+    return () => unSubMatches();
+  }, [currentUser]);
 
   const handleDeleteConfirm = () => {
     if (!deleteModalItem) return;
@@ -54,6 +73,72 @@ export const Dashboard = () => {
       {/* Feature A: Village Common Image Slider (Dynamic & Unlimited) */}
       <VillageCommonImageSlider />
 
+      {/* Feature B: Live Matches Dashboard Section */}
+      {liveMatches.length > 0 && (
+        <div className="card" style={{ marginBottom: '1.5rem', borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.03)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Radio size={20} color="#ef4444" style={{ animation: 'pulse 1.5s infinite' }} />
+              <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0, color: '#dc2626' }}>
+                🔴 সচল লাইভ ম্যাচ (Live Matches)
+              </h2>
+            </div>
+            <Link to="/sports" className="btn btn-secondary btn-sm">সব দেখুন</Link>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.85rem' }}>
+            {liveMatches.map(m => (
+              <div key={m.id} style={{ border: '1px solid #fca5a5', borderRadius: '10px', padding: '0.85rem', backgroundColor: '#fff' }}>
+                <div style={{ fontSize: '0.8rem', color: '#dc2626', fontWeight: '700', marginBottom: '0.3rem' }}>
+                  {m.gameType === 'cricket' ? '🏏 ক্রিকেট লাইভ' : '⚽ ফুটবল লাইভ'}
+                </div>
+                <div style={{ fontWeight: '800', fontSize: '1.05rem', margin: '0.2rem 0' }}>
+                  {m.teamA} VS {m.teamB}
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.65rem' }}>
+                  স্কোর: {m.scoreSummary || 'সচল'}
+                </div>
+                <Link to={`/match/${m.id}`} className="btn btn-primary btn-sm btn-mobile-full" style={{ backgroundColor: '#dc2626', borderColor: '#dc2626', justifyContent: 'center' }}>
+                  <Tv size={14} /> লাইভ দেখুন
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Feature C: My Tournaments Dashboard Section */}
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Trophy size={18} color="var(--color-primary-600)" /> আমার আয়োজিত টুর্নামেন্টসমূহ ({myTournaments.length})
+          </h2>
+          <Link to="/sports" className="btn btn-primary btn-sm"><Plus size={14} /> নতুন টুর্নামেন্ট</Link>
+        </div>
+
+        {myTournaments.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '1.25rem 0.5rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+            আপনি এখনো কোনো টুর্নামেন্ট আয়োজন করেননি।
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.75rem' }}>
+            {myTournaments.map(t => (
+              <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0.85rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)' }}>
+                <div>
+                  <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>{t.name}</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    স্ট্যাটাস: <span className={`badge ${t.status === 'approved' ? 'badge-green' : 'badge-amber'}`}>{t.status === 'approved' ? 'অনুমোদিত' : 'অপেক্ষমাণ'}</span>
+                  </div>
+                </div>
+                <Link to={`/tournament/${t.id}/manage`} className="btn btn-secondary btn-sm" style={{ padding: '0.35rem 0.65rem' }}>
+                  ব্যবস্থাপনা →
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Dev Demo Role Selector Bar */}
       <div className="card" style={{ marginBottom: '1.5rem', padding: '0.85rem', backgroundColor: 'var(--bg-elevated)' }}>
         <div style={{ fontWeight: '700', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -61,7 +146,7 @@ export const Dashboard = () => {
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
           <button onClick={() => { switchDemoRole(['super_admin']); addToast('সুপার এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">সুপার এডমিন</button>
-          <button onClick={() => { switchDemoRole(['game_admin']); addToast('খেলাধুলা এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">ক্রীড়া এডমিন</button>
+          <button onClick={() => { switchDemoRole(['game_admin']); addToast('ক্রীড়া এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">ক্রীড়া এডমিন</button>
           <button onClick={() => { switchDemoRole(['education_admin']); addToast('শিক্ষা এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">শিক্ষা এডমিন</button>
           <button onClick={() => { switchDemoRole(['mosque_admin']); addToast('মসজিদ এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">মসজিদ এডমিন</button>
           <button onClick={() => { switchDemoRole(['organization_admin']); addToast('যুব সংঘ এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">যুব সংঘ এডমিন</button>

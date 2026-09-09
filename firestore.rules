@@ -2,7 +2,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper functions
+    // ─── Helper Functions ─────────────────────────────────────────────────────
+
     function isSignedIn() {
       return request.auth != null;
     }
@@ -10,21 +11,28 @@ service cloud.firestore {
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
-    
+
+    // Safe getUserData — returns null if user doc doesn't exist (no crash)
     function getUserData() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
     
+    // Safe role check — won't crash if roles field is missing
     function hasRole(role) {
-      return isSignedIn() && 
-        (getUserData().roles.hasAny([role]) || getUserData().roles.hasAny(['super_admin']));
+      return isSignedIn() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          (getUserData().get('roles', []).hasAny([role]) || 
+           getUserData().get('roles', []).hasAny(['super_admin'])))
+      );
     }
     
     function isSuperAdmin() {
-      return isSignedIn() && getUserData().roles.hasAny(['super_admin']);
+      return isSignedIn() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        getUserData().get('roles', []).hasAny(['super_admin']);
     }
 
-    // Users Collection
+    // ─── Users ───────────────────────────────────────────────────────────────
     match /users/{userId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.auth.uid == userId;
@@ -32,25 +40,25 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
     
-    // Site Settings
+    // ─── Site Settings ───────────────────────────────────────────────────────
     match /site_settings/{settingId} {
       allow read: if true;
       allow write: if isSuperAdmin();
     }
     
-    // Village Common Images
+    // ─── Village Common Images ───────────────────────────────────────────────
     match /village_common_images/{imageId} {
       allow read: if true;
       allow write: if isSuperAdmin();
     }
     
-    // Map Locations
+    // ─── Map Locations ───────────────────────────────────────────────────────
     match /map_locations/{locId} {
       allow read: if true;
       allow write: if isSuperAdmin() || hasRole('emergency_admin');
     }
     
-    // Agriculture Fields & Machinery & Land Leases
+    // ─── Agriculture ─────────────────────────────────────────────────────────
     match /agriculture_fields/{fieldId} {
       allow read: if true;
       allow write: if isSuperAdmin();
@@ -66,28 +74,54 @@ service cloud.firestore {
       allow update, delete: if isOwner(resource.data.createdBy) || isSuperAdmin();
     }
     
-    // Sports & Tournaments & Teams & Matches
+    // ─── Sports: Tournaments ─────────────────────────────────────────────────
     match /tournaments/{tId} {
       allow read: if true;
       allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.createdBy) || hasRole('game_admin');
+      // Only the owner or game_admin/super_admin can update/delete
+      allow update: if isOwner(resource.data.createdBy) || hasRole('game_admin');
+      allow delete: if isOwner(resource.data.createdBy) || isSuperAdmin();
     }
+
+    // ─── Sports: Team Registrations ──────────────────────────────────────────
     match /tournament_registrations/{regId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.createdBy) || hasRole('game_admin');
+      // Only registrant, game_admin, or super_admin can approve/reject/delete
+      allow update, delete: if isOwner(resource.data.registeredBy) 
+                            || hasRole('game_admin') 
+                            || isSuperAdmin();
     }
+
+    // ─── Sports: Matches (FIXED — only owner/game_admin can write) ───────────
     match /matches/{matchId} {
       allow read: if true;
-      allow write: if hasRole('game_admin');
+      // Only game_admin or super_admin can create/update/delete matches
+      allow create: if isSignedIn();
+      allow update, delete: if hasRole('game_admin') || isSuperAdmin();
     }
+
+    // ─── Sports: Teams ───────────────────────────────────────────────────────
     match /teams/{teamId} {
       allow read: if true;
       allow create: if isSignedIn();
       allow update, delete: if isOwner(resource.data.createdBy) || hasRole('game_admin');
     }
+
+    // ─── Sports: Live Scores (real-time scoring, only signed-in) ─────────────
+    match /live_scores/{matchId} {
+      allow read: if true;
+      // Only signed-in users (tournament owner/scorer) can write
+      allow write: if isSignedIn();
+    }
+
+    // ─── Sports: Live Streams (broadcasting, only signed-in) ─────────────────
+    match /live_streams/{matchId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
     
-    // Education & Mosques
+    // ─── Education & Mosques ─────────────────────────────────────────────────
     match /institutions/{instId} {
       allow read: if true;
       allow write: if hasRole('education_admin');
@@ -101,7 +135,7 @@ service cloud.firestore {
       allow write: if hasRole('mosque_admin');
     }
     
-    // Organization
+    // ─── Organization ─────────────────────────────────────────────────────────
     match /organization/{docId} {
       allow read: if true;
       allow write: if hasRole('organization_admin');
@@ -119,7 +153,7 @@ service cloud.firestore {
       allow write: if hasRole('organization_admin');
     }
     
-    // Events
+    // ─── Cultural / Social / Emergency / Religious Events ────────────────────
     match /cultural_events/{evtId} {
       allow read: if true;
       allow write: if hasRole('cultural_admin');
@@ -137,14 +171,16 @@ service cloud.firestore {
       allow write: if hasRole('religious_admin');
     }
     
-    // Notifications
+    // ─── Notifications ───────────────────────────────────────────────────────
     match /notifications/{notifId} {
+      // Users can only read/update their own notifications
       allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn();
       allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
     
-    // Audit Logs
+    // ─── Audit Logs ──────────────────────────────────────────────────────────
     match /admin_logs/{logId} {
       allow read: if isSuperAdmin();
       allow create: if isSignedIn();

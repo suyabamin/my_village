@@ -36,8 +36,10 @@ export const LiveMatchPage = () => {
       {/* Live Stream Video Player Box */}
       <div style={{ marginBottom: '1.5rem' }}>
         <LiveStreamPlayer 
+          matchId={id}
           streamUrl={stream?.streamUrl || ''} 
-          isLive={stream?.status === 'active' || true}
+          provider={stream?.provider || 'webrtc'}
+          isLive={stream?.status === 'active'}
           matchTitle={match ? `${match.teamA} বনাম ${match.teamB}` : 'লাইভ ম্যাচ ব্রডকাস্ট'}
           cameraAngle={stream?.cameraAngle || 'প্রধান মাঠ ক্যামেরা'}
         />

@@ -115,10 +115,13 @@ service cloud.firestore {
       allow write: if isSignedIn();
     }
 
-    // ─── Sports: Live Streams (broadcasting, only signed-in) ─────────────────
+    // ─── Sports: Live Streams (broadcasting & WebRTC peer signaling) ──────────
     match /live_streams/{matchId} {
       allow read: if true;
       allow write: if isSignedIn();
+      match /{allSubcollections=**} {
+        allow read, write: if true;
+      }
     }
     
     // ─── Education & Mosques ─────────────────────────────────────────────────

@@ -6,7 +6,7 @@ export const InstitutionDetail = () => {
   const { id } = useParams();
 
   return (
-    <div className="container" style={{ padding: '2.5rem 1.25rem', maxWidth: '850px' }}>
+    <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2.5rem)', maxWidth: '850px' }}>
       <Link to="/education" className="btn btn-secondary btn-sm" style={{ marginBottom: '1.5rem' }}>
         <ArrowLeft size={16} /> শিক্ষা পোর্টালে ফিরুন
       </Link>
@@ -16,7 +16,7 @@ export const InstitutionDetail = () => {
           সরকারি প্রাতিষ্ঠানিক তথ্য
         </span>
 
-        <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: 'var(--color-primary-800)' }}>
+        <h1 style={{ fontSize: 'clamp(1.4rem, 4.5vw, 2.2rem)', fontWeight: '800', marginBottom: '0.5rem', color: 'var(--color-primary-800)' }}>
           আলমদীপাড়া সরকারি প্রাথমিক বিদ্যালয়
         </h1>
 
@@ -38,7 +38,7 @@ export const InstitutionDetail = () => {
           আলমদীপাড়া সরকারি প্রাথমিক বিদ্যালয় গ্রামের শিশুদের মেধা বিকাশ ও সঠিক শিক্ষা দিতে বদ্ধপরিকর। প্রতিটি শ্রেণিকক্ষে পর্যাপ্ত আলোর ব্যবস্থা ও ডিজিটাল কনটেন্টের সাহায্যে পাঠদান করানো হয়। 
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ padding: '1rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
             <strong style={{ color: 'var(--color-primary-600)' }}>বিনামূল্যে পাঠ্যবই</strong>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>বছরের প্রথম দিনেই শতভাগ বিনামূল্যে নতুন বই বিতরণ।</p>

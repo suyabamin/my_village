@@ -21,12 +21,12 @@ export const Education = () => {
   ]);
 
   return (
-    <div className="container" style={{ padding: '2.5rem 1.25rem' }}>
+    <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
       <div style={{ marginBottom: '2rem' }}>
         <div className="badge badge-blue" style={{ marginBottom: '0.5rem' }}>
           শিক্ষা পোর্টাল
         </div>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2.2rem)', fontWeight: '800', marginBottom: '0.5rem' }}>
           আলমদীপাড়া শিক্ষা প্রতিষ্ঠানসমূহ
         </h1>
         <p style={{ color: 'var(--text-muted)' }}>
@@ -34,7 +34,7 @@ export const Education = () => {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+      <div className="home-cards-grid">
         {institutions.map(inst => (
           <div key={inst.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>

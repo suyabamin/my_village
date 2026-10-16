@@ -193,7 +193,7 @@ export const TournamentManagement = () => {
               <p>এখনো কোনো দল এই টুর্নামেন্টে রেজিস্ট্রেশন করেনি।</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+            <div className="home-cards-grid">
               {registrations.map(r => (
                 <div key={r.id} className="card" style={{ padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>

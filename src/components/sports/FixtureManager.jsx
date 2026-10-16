@@ -138,7 +138,7 @@ export const FixtureManager = ({ tournament, onSelectMatchForScoring }) => {
           এখনো কোনো ফিক্সচার তৈরি করা হয়নি। "অটমেটিক ফিক্সচার তৈরি" বা "নতুন ফিক্সচার যোগ করুন" ব্যবহার করুন।
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div className="home-cards-grid">
           {matches.map(m => (
             <div key={m.id} className="card" style={{ padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>

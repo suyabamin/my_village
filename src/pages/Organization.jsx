@@ -71,7 +71,7 @@ export const Organization = () => {
               আলমদীপাড়া মাদকবিরোধী ও যুব উন্নয়ন সংঘ গ্রামের যুবসমাজকে কুসংস্কার ও মাদকের ভয়াল থাবা থেকে রক্ষা করে খেলাধুলা, ডিজিটাল শিক্ষা ও সামাজিক কাজের মাধ্যমে একটি আদর্শ ডিজিটাল গ্রাম গঠনে কাজ করছে।
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.85rem' }}>
               <div style={{ padding: '0.85rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
                 <CheckCircle2 color="#16a34a" size={18} style={{ marginBottom: '0.3rem' }} />
                 <strong>মাদকমুক্ত গ্রাম গড়া</strong>
@@ -122,7 +122,7 @@ export const Organization = () => {
 
       {/* Tab 3: Gallery */}
       {activeTab === 'gallery' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.25rem' }}>
+        <div className="home-cards-grid">
           {galleryImages.map((img, idx) => (
             <div key={idx} className="card" style={{ padding: '0.65rem' }}>
               <img src={img.url} alt={img.title} loading="lazy" style={{ width: '100%', height: '190px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: '0.65rem' }} />

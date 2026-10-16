@@ -9,10 +9,10 @@ export const MainLayout = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100vw', overflowX: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', minHeight: '100dvh', width: '100%', maxWidth: '100%', overflowX: 'clip' }}>
       <Header onOpenMobileNav={() => setMobileNavOpen(true)} />
       <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
-      <main style={{ flex: 1 }}>
+      <main style={{ flex: 1, minWidth: 0 }} className="main-content">
         <Outlet />
       </main>
       <Footer />

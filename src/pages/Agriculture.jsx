@@ -100,7 +100,7 @@ export const Agriculture = () => {
   };
 
   return (
-    <div className="container" style={{ padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(0.85rem, 3vw, 1.25rem)' }}>
+    <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
       
       {/* Header */}
       <div style={{ marginBottom: '1.75rem' }}>
@@ -150,7 +150,7 @@ export const Agriculture = () => {
 
       {/* Tab 1: 3 Fields */}
       {activeTab === 'fields' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+        <div className="home-cards-grid">
           {fields.map(field => (
             <div key={field.id} className="card card-interactive" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
@@ -197,7 +197,7 @@ export const Agriculture = () => {
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+          <div className="home-cards-grid">
             {machines.map(mach => (
               <div key={mach.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
@@ -248,7 +248,7 @@ export const Agriculture = () => {
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+          <div className="home-cards-grid">
             {leases.map(lease => (
               <div key={lease.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
@@ -295,7 +295,7 @@ export const Agriculture = () => {
                 <label className="form-label">যন্ত্রের নাম</label>
                 <input type="text" className="form-input" required placeholder="যেমন: ফোর্ড ৭৭৪০ পাওয়ার টিলার" value={machineForm.name} onChange={e => setMachineForm({...machineForm, name: e.target.value})} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
                   <label className="form-label">শ্রেণি</label>
                   <select className="form-select" value={machineForm.category} onChange={e => setMachineForm({...machineForm, category: e.target.value})}>
@@ -310,7 +310,7 @@ export const Agriculture = () => {
                   <input type="text" className="form-input" placeholder="যেমন: ২০২৪ মডেল" value={machineForm.model} onChange={e => setMachineForm({...machineForm, model: e.target.value})} />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
                   <label className="form-label">ভাড়ার হার (টাকা)</label>
                   <input type="number" className="form-input" required placeholder="১২০০" value={machineForm.price} onChange={e => setMachineForm({...machineForm, price: e.target.value})} />
@@ -361,7 +361,7 @@ export const Agriculture = () => {
                 <label className="form-label">অবস্থান (মাঠ ও এলাকা)</label>
                 <input type="text" className="form-input" required placeholder="যেমন: লাটিয়াকুড়ি পূর্ব পাড়" value={leaseForm.location} onChange={e => setLeaseForm({...leaseForm, location: e.target.value})} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
                   <label className="form-label">চুক্তির টাকা (টাকা)</label>
                   <input type="number" className="form-input" required placeholder="২৫০০০" value={leaseForm.price} onChange={e => setLeaseForm({...leaseForm, price: e.target.value})} />

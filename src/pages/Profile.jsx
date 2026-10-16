@@ -31,14 +31,14 @@ export const Profile = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '2.5rem 1.25rem', maxWidth: '700px' }}>
+    <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2.5rem)', maxWidth: '700px' }}>
       <div className="card">
-        <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--color-primary-800)' }}>
+        <h1 style={{ fontSize: 'clamp(1.4rem, 4.5vw, 1.8rem)', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--color-primary-800)' }}>
           আমার প্রোফাইল
         </h1>
 
         {/* User Card with Profile Avatar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', padding: 'clamp(0.75rem, 3vw, 1rem)', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
           <ProfileAvatar 
             user={userProfile || currentUser} 
             size={64} 

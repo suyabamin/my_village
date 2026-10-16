@@ -17,18 +17,18 @@ export const Culture = () => {
   ]);
 
   return (
-    <div className="container" style={{ padding: '2.5rem 1.25rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+    <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.75rem' }}>
         <div>
           <div className="badge badge-amber" style={{ marginBottom: '0.5rem' }}>সাংস্কৃতিক ঐতিহ্য</div>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: '800' }}>সাংস্কৃতিক উৎসব ও অনুষ্ঠান</h1>
+          <h1 style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2.2rem)', fontWeight: '800' }}>সাংস্কৃতিক উৎসব ও অনুষ্ঠান</h1>
         </div>
         {hasRole('cultural_admin') && (
           <button className="btn btn-primary">+ নতুন অনুষ্ঠান যোগ করুন</button>
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+      <div className="home-cards-grid">
         {events.map(evt => (
           <div key={evt.id} className="card">
             <img src={evt.poster} alt={evt.title} style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }} />

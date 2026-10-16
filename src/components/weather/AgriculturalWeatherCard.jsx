@@ -113,7 +113,7 @@ const styles = {
   },
   adviceGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
     gap: '0.75rem',
   },
   adviceBox: {

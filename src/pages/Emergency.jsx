@@ -37,14 +37,14 @@ export const Emergency = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '2.5rem 1.25rem' }}>
+    <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
       
       {/* Emergency Header */}
       <div style={{ marginBottom: '2rem' }}>
         <div className="badge badge-red" style={{ marginBottom: '0.5rem' }}>
           জরুরি নোটিশ বোর্ড
         </div>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', color: '#ef4444' }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2.2rem)', fontWeight: '800', marginBottom: '0.5rem', color: '#ef4444' }}>
           জরুরি সভা ও গ্রাম সতর্কবার্তা
         </h1>
         <p style={{ color: 'var(--text-muted)' }}>
@@ -76,7 +76,7 @@ export const Emergency = () => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
+      <div className="home-cards-grid">
         {emergencies.map(e => (
           <div key={e.id} className="card" style={{ borderLeft: '5px solid #ef4444' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>

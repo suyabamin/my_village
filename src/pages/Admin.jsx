@@ -169,7 +169,7 @@ export const Admin = () => {
 
       {/* Tab 1: Overview */}
       {activeTab === 'overview' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1.25rem' }}>
           <div className="card" style={{ textAlign: 'center', padding: '1.25rem' }}>
             <div style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--color-primary-600)' }}>{userList.length} জন</div>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>নিবন্ধিত ব্যবহারকারী</div>
@@ -197,7 +197,7 @@ export const Admin = () => {
               বর্তমানে অনুমোদনের জন্য কোনো নতুন টুর্নামেন্ট বাকি নেই।
             </p>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+            <div className="home-cards-grid">
               {pendingTournaments.map(t => (
                 <div key={t.id} style={{ border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', backgroundColor: 'var(--bg-elevated)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>

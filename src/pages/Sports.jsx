@@ -147,7 +147,7 @@ export const Sports = () => {
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '1.25rem' }}>
+          <div className="home-cards-grid">
             {activeTournaments.map(t => (
               <div key={t.id} className="card card-interactive" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
@@ -237,7 +237,7 @@ export const Sports = () => {
       {activeTab === 'completed' && (
         <div>
           <h2 style={{ fontSize: 'clamp(1.2rem, 3.5vw, 1.4rem)', fontWeight: '700', marginBottom: '1.25rem' }}>শেষ হওয়া টুর্নামেন্ট ও ফলাফল</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+          <div className="home-cards-grid">
             {completedTournaments.map(t => (
               <div key={t.id} className="card" style={{ padding: '1rem' }}>
                 <span className="badge badge-secondary" style={{ marginBottom: '0.5rem' }}>সম্পন্ন টুর্নামেন্ট</span>
@@ -266,7 +266,7 @@ export const Sports = () => {
                 <input type="text" className="form-input" required placeholder="যেমন: আলমদীপাড়া বিজয় দিবস কাপ ২০২৬" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
                   <label className="form-label">খেলার ধরন (Sport Type) *</label>
                   <select className="form-select" value={form.sport} onChange={e => setForm({...form, sport: e.target.value})}>
@@ -281,7 +281,7 @@ export const Sports = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
                   <label className="form-label">মোট দল সংখ্যা *</label>
                   <input type="number" className="form-input" required value={form.teamCount} onChange={e => setForm({...form, teamCount: e.target.value})} />
@@ -293,7 +293,7 @@ export const Sports = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
                   <label className="form-label">চ্যাম্পিয়ন পুরস্কার</label>
                   <input type="text" className="form-input" placeholder="যেমন: ৳৫০,০০০" value={form.championPrize} onChange={e => setForm({...form, championPrize: e.target.value})} />
@@ -305,7 +305,7 @@ export const Sports = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
                   <label className="form-label">শুরুর তারিখ *</label>
                   <input type="date" className="form-input" required value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} />

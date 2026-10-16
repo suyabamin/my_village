@@ -46,8 +46,9 @@ export const Register = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '3.5rem 1.25rem', maxWidth: '500px' }}>
-      <div className="card animate-fade-in" style={{ padding: '2rem' }}>
+    <div className="auth-page-wrapper">
+      <div className="auth-card">
+      <div className="card animate-fade-in" style={{ padding: 'clamp(1.5rem, 5vw, 2rem)' }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <h1 style={{ fontSize: '1.6rem', fontWeight: '800' }}>নতুন একাউন্ট রেজিস্ট্রেশন</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>আলমদীপাড়া ডিজিটাল গ্রামে স্বাগতম</p>
@@ -75,7 +76,7 @@ export const Register = () => {
             <input type="tel" className="form-input" required placeholder="017........" value={phone} onChange={e => setPhone(e.target.value)} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
             <div className="form-group">
               <label className="form-label">পাসওয়ার্ড</label>
               <input type="password" className="form-input" required placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
@@ -94,6 +95,7 @@ export const Register = () => {
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
           ইতিমধ্যে অ্যাকাউন্ট আছে? <Link to="/login" style={{ color: 'var(--color-primary-600)', fontWeight: '700' }}>লগইন করুন</Link>
         </div>
+      </div>
       </div>
     </div>
   );

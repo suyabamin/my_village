@@ -177,7 +177,7 @@ export const TournamentDetail = () => {
             {tournament.description}
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', backgroundColor: 'var(--bg-elevated)', padding: '0.85rem', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '0.75rem', backgroundColor: 'var(--bg-elevated)', padding: '0.85rem', borderRadius: 'var(--radius-md)' }}>
             <div><strong>খেলার স্থান:</strong> {tournament.venue}</div>
             <div><strong>তারিখ:</strong> {tournament.startDate} থেকে {tournament.endDate}</div>
             <div><strong>আয়োজক:</strong> {tournament.organizerName || 'আলমদীপাড়া যুব কমিটি'}</div>
@@ -206,7 +206,7 @@ export const TournamentDetail = () => {
       {activeTab === 'overview' && (
         <div className="card">
           <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem' }}>🏆 টুর্নামেন্ট পুরস্কার ও নিয়মাবলী</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
             <div style={{ padding: '1rem', backgroundColor: '#fef3c7', borderRadius: '12px', color: '#92400e' }}>
               <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>🥇 চ্যাম্পিয়ন পুরস্কার</div>
               <div style={{ fontSize: '1.4rem', fontWeight: '800', marginTop: '0.2rem' }}>{tournament.prizes?.champion || '৳৫০,০০০'}</div>
@@ -231,7 +231,7 @@ export const TournamentDetail = () => {
           {approvedTeams.length === 0 ? (
             <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>এখনো কোনো দল অনুমোদিত হয়নি।</p>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 220px), 1fr))', gap: '1rem' }}>
               {approvedTeams.map(t => (
                 <div key={t.id} style={{ border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', backgroundColor: 'var(--bg-elevated)' }}>
                   <h3 style={{ fontSize: '1.1rem', fontWeight: '700', margin: '0 0 0.3rem' }}>{t.teamName}</h3>
@@ -251,7 +251,7 @@ export const TournamentDetail = () => {
           {matches.length === 0 ? (
             <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>এখনো ফিক্সচার প্রকাশ করা হয়নি।</p>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+            <div className="home-cards-grid">
               {matches.map(m => (
                 <div key={m.id} style={{ border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', backgroundColor: 'var(--bg-elevated)' }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--color-primary-600)', fontWeight: '700', marginBottom: '0.3rem' }}>{m.round}</div>

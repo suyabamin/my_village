@@ -22,8 +22,9 @@ export const ForgotPassword = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '4rem 1.25rem', maxWidth: '480px' }}>
-      <div className="card animate-fade-in" style={{ padding: '2rem' }}>
+    <div className="auth-page-wrapper">
+      <div className="auth-card">
+      <div className="card animate-fade-in" style={{ padding: 'clamp(1.5rem, 5vw, 2rem)' }}>
         <Link to="/login" className="btn btn-secondary btn-sm" style={{ marginBottom: '1.25rem' }}>
           <ArrowLeft size={16} /> লগইনে ফিরুন
         </Link>
@@ -50,6 +51,7 @@ export const ForgotPassword = () => {
             আপনার <strong>{email}</strong> ঠিকানায় রিসেট করার নিয়ম পাঠানো হয়েছে। ইমেইল ইনবক্স চেক করুন।
           </div>
         )}
+      </div>
       </div>
     </div>
   );

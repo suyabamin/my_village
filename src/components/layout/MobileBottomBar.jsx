@@ -14,21 +14,32 @@ export const MobileBottomBar = () => {
   ];
 
   return (
-    <div className="mobile-bottom-bar">
+    <nav
+      className="mobile-bottom-bar"
+      aria-label="মোবাইল বটম নেভিগেশন"
+      role="navigation"
+    >
       {items.map(item => {
         const Icon = item.icon;
-        const isActive = location.pathname === item.path;
+        const isActive = location.pathname === item.path ||
+          (item.path !== '/' && location.pathname.startsWith(item.path));
         return (
           <Link
             key={item.path}
             to={item.path}
-            className={`mobile-bottom-item ${isActive ? 'active' : ''}`}
+            className={`mobile-bottom-item${isActive ? ' active' : ''}`}
+            aria-label={item.label}
+            aria-current={isActive ? 'page' : undefined}
           >
-            <Icon size={20} color={isActive ? 'var(--color-primary-600)' : 'var(--text-muted)'} />
-            <span>{item.label}</span>
+            <Icon
+              size={22}
+              color={isActive ? 'var(--color-primary-600)' : 'var(--text-muted)'}
+              aria-hidden="true"
+            />
+            <span style={{ lineHeight: 1.2 }}>{item.label}</span>
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 };

@@ -16,7 +16,7 @@ export const FieldDetail = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '2.5rem 1.25rem', maxWidth: '900px' }}>
+    <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2.5rem)', maxWidth: '900px' }}>
       <Link to="/agriculture" className="btn btn-secondary btn-sm" style={{ marginBottom: '1.5rem' }}>
         <ArrowLeft size={16} /> কৃষি পোর্টালে ফিরুন
       </Link>
@@ -26,11 +26,11 @@ export const FieldDetail = () => {
           আলমদীপাড়া প্রধান কৃষি ক্ষেত্র
         </div>
 
-        <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--color-primary-700)' }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2.2rem)', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--color-primary-700)' }}>
           {field.name} কৃষি মাঠের বিস্তারিত তথ্য
         </h1>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
           <div style={{ padding: '1rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary-600)', fontWeight: '700', marginBottom: '0.5rem' }}>
               <Sprout size={20} /> বর্তমান ফসল অবস্থা

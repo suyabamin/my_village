@@ -12,9 +12,9 @@ export const MapPage = () => {
   }, []);
 
   return (
-    <div className="container" style={{ padding: '2rem 1.25rem' }}>
+    <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2rem)' }}>
       <div style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2rem)', fontWeight: '800', marginBottom: '0.5rem' }}>
           আলমদীপাড়া ডিজিটাল মানচিত্র
         </h1>
         <p style={{ color: 'var(--text-muted)' }}>

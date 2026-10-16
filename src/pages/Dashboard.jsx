@@ -61,7 +61,7 @@ export const Dashboard = () => {
             </p>
           </div>
           
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '320px' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <Link to="/profile" className="btn btn-secondary btn-sm style-mobile-btn">প্রোফাইল সম্পাদন</Link>
             {userProfile?.roles?.length > 0 && (
               <Link to="/admin" className="btn btn-primary btn-sm style-mobile-btn">এডমিন প্যানেলে প্রবেশ</Link>
@@ -86,7 +86,7 @@ export const Dashboard = () => {
             <Link to="/sports" className="btn btn-secondary btn-sm">সব দেখুন</Link>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.85rem' }}>
+          <div className="home-cards-grid">
             {liveMatches.map(m => (
               <div key={m.id} style={{ border: '1px solid #fca5a5', borderRadius: '10px', padding: '0.85rem', backgroundColor: '#fff' }}>
                 <div style={{ fontSize: '0.8rem', color: '#dc2626', fontWeight: '700', marginBottom: '0.3rem' }}>
@@ -121,7 +121,7 @@ export const Dashboard = () => {
             আপনি এখনো কোনো টুর্নামেন্ট আয়োজন করেননি।
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
             {myTournaments.map(t => (
               <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0.85rem', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)' }}>
                 <div>
@@ -155,7 +155,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Grid Content: My Machines & My Leases */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
         
         {/* Section 1: My Machines */}
         <div className="card">

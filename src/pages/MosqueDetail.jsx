@@ -28,7 +28,7 @@ export const MosqueDetail = () => {
           ঈদের জামায়াতের সময়সূচি
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.75rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '0.75rem', marginBottom: '1.75rem' }}>
           <div style={{ padding: '0.85rem', backgroundColor: 'var(--color-primary-50)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
             <h3 style={{ fontSize: '1rem', color: 'var(--color-primary-900)' }}>ঈদুল ফিতরের জামাত</h3>
             <div style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--color-primary-700)', marginTop: '0.2rem' }}>

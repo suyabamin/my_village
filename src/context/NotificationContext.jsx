@@ -21,17 +21,23 @@ export const NotificationProvider = ({ children }) => {
     <NotificationContext.Provider value={{ toasts, addToast, removeToast }}>
       {children}
       {/* Render Toast Floating Container */}
-      <div className="toast-container" style={{
-        position: 'fixed',
-        bottom: '1.5rem',
-        right: '1.5rem',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.5rem',
-        maxWidth: '380px',
-        pointerEvents: 'none'
-      }}>
+      <div
+        aria-live="polite"
+        aria-atomic="false"
+        role="status"
+        className="toast-container-live"
+        style={{
+          position: 'fixed',
+          /* Above mobile bottom bar on small screens */
+          bottom: 'calc(var(--bottom-bar-height, 64px) + env(safe-area-inset-bottom, 0px) + 0.75rem)',
+          right: '0.85rem',
+          left: '0.85rem',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.5rem',
+          pointerEvents: 'none',
+        }}>
         {toasts.map(toast => (
           <div key={toast.id} className={`toast toast-${toast.type} animate-fade-in`} style={{
             pointerEvents: 'auto',

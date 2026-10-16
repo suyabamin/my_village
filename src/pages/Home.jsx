@@ -198,11 +198,7 @@ export const Home = () => {
             </p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '1.25rem'
-          }}>
+          <div className="home-cards-grid">
             {dashboardCards.map((card) => {
               const Icon = card.icon;
               return (
@@ -220,17 +216,11 @@ export const Home = () => {
                   }}
                 >
                   <div>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      backgroundColor: `${card.color}15`,
-                      color: card.color,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justify: 'center',
-                      marginBottom: '1rem'
-                    }}>
+                    <div
+                    className="card-icon-box"
+                    style={{ backgroundColor: `${card.color}15`, color: card.color }}
+                    aria-hidden="true"
+                  >
                       <Icon size={26} />
                     </div>
                     

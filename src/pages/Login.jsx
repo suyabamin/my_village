@@ -36,8 +36,9 @@ export const Login = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '4rem 1.25rem', maxWidth: '480px' }}>
-      <div className="card animate-fade-in" style={{ padding: '2rem' }}>
+    <div className="auth-page-wrapper">
+      <div className="auth-card">
+      <div className="card animate-fade-in" style={{ padding: 'clamp(1.5rem, 5vw, 2rem)' }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <div style={{
             width: '48px',
@@ -115,6 +116,7 @@ export const Login = () => {
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
           অ্যাকাউন্ট নেই? <Link to="/register" style={{ color: 'var(--color-primary-600)', fontWeight: '700' }}>নতুন রেজিস্ট্রেশন করুন</Link>
         </div>
+      </div>
       </div>
     </div>
   );

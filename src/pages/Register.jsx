@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { User, Mail, Phone, Lock, AlertCircle } from 'lucide-react';
+import GoogleSignInButton from '../components/auth/GoogleSignInButton';
 
 export const Register = () => {
   const [displayName, setDisplayName] = useState('');
@@ -38,8 +39,19 @@ export const Register = () => {
     e.preventDefault();
     setErrorMessage('');
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = displayName.trim();
+    const cleanPhone = phone.trim();
+
+    // Basic email syntax validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      setErrorMessage('সঠিক ফরম্যাটের ইমেইল ঠিকানা লিখুন (যেমন: name@gmail.com)।');
+      return;
+    }
+
     if (password !== confirmPassword) {
-      setErrorMessage('পাসওয়ার্ড দুটি মিলছে না।');
+      setErrorMessage('পাসওয়ার্ড দুটি মিলছে না। পুনরায় লিখুন।');
       return;
     }
 
@@ -51,25 +63,50 @@ export const Register = () => {
     setSubmitting(true);
 
     try {
-      await register(email.trim(), password, displayName.trim(), phone.trim());
-      addToast('অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে! স্বাগতম।', 'success');
-      navigate('/dashboard');
+      await register(cleanEmail, password, cleanName, cleanPhone);
+      addToast('রেজিস্ট্রেশন সফল! আপনার ইমেইল যাচাই করার জন্য লিঙ্ক পাঠানো হয়েছে।', 'success');
+      navigate('/verify-email');
     } catch (err) {
       console.error(err);
       setErrorMessage(getFriendlyErrorMessage(err));
-      addToast('রেজিস্ট্রেশন ব্যর্থ হয়েছে।', 'error');
+      addToast('রেজিস্ট্রেশন সম্পন্ন করা যায়নি।', 'error');
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleGoogleSuccess = () => {
+    navigate('/dashboard');
+  };
+
   return (
     <div className="auth-page-wrapper">
       <div className="auth-card">
-        <div className="card animate-fade-in" style={{ padding: 'clamp(1.5rem, 5vw, 2rem)' }}>
+        <div className="card animate-fade-in" style={{ padding: 'clamp(1.5rem, 5vw, 2.25rem)' }}>
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             <h1 style={{ fontSize: '1.6rem', fontWeight: '800' }}>নতুন অ্যাকাউন্ট রেজিস্ট্রেশন</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>আলমদীপাড়া ডিজিটাল গ্রামে স্বাগতম</p>
+          </div>
+
+          {/* 1. Continue with Google Button */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <GoogleSignInButton 
+              onSuccess={handleGoogleSuccess}
+              text="গুগল দিয়ে এগিয়ে যান" 
+            />
+          </div>
+
+          {/* Or Divider */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: '1.25rem 0',
+            color: 'var(--text-muted)',
+            fontSize: '0.85rem'
+          }}>
+            <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border-color, #e5e7eb)' }} />
+            <span style={{ padding: '0 0.75rem' }}>অথবা ইমেইল দিয়ে রেজিস্ট্রেশন করুন</span>
+            <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border-color, #e5e7eb)' }} />
           </div>
 
           {errorMessage && (
@@ -81,62 +118,82 @@ export const Register = () => {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label className="form-label">আপনার পূর্ণ নাম</label>
-              <input 
-                type="text" 
-                className="form-input" 
-                required 
-                placeholder="যেমন: আব্দুল রহিম" 
-                value={displayName} 
-                onChange={e => setDisplayName(e.target.value)} 
-              />
+              <div style={{ position: 'relative' }}>
+                <User size={18} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  style={{ paddingLeft: '2.5rem' }}
+                  required 
+                  placeholder="যেমন: আব্দুল রহিম" 
+                  value={displayName} 
+                  onChange={e => setDisplayName(e.target.value)} 
+                />
+              </div>
             </div>
 
             <div className="form-group">
               <label className="form-label">ইমেইল ঠিকানা</label>
-              <input 
-                type="email" 
-                className="form-input" 
-                required 
-                placeholder="name@example.com" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-              />
+              <div style={{ position: 'relative' }}>
+                <Mail size={18} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input 
+                  type="email" 
+                  className="form-input" 
+                  style={{ paddingLeft: '2.5rem' }}
+                  required 
+                  placeholder="name@gmail.com" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                />
+              </div>
             </div>
 
             <div className="form-group">
               <label className="form-label">মোবাইল নম্বর</label>
-              <input 
-                type="tel" 
-                className="form-input" 
-                required 
-                placeholder="017........" 
-                value={phone} 
-                onChange={e => setPhone(e.target.value)} 
-              />
+              <div style={{ position: 'relative' }}>
+                <Phone size={18} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input 
+                  type="tel" 
+                  className="form-input" 
+                  style={{ paddingLeft: '2.5rem' }}
+                  required 
+                  placeholder="017........" 
+                  value={phone} 
+                  onChange={e => setPhone(e.target.value)} 
+                />
+              </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
               <div className="form-group">
                 <label className="form-label">পাসওয়ার্ড</label>
-                <input 
-                  type="password" 
-                  className="form-input" 
-                  required 
-                  placeholder="••••••••" 
-                  value={password} 
-                  onChange={e => setPassword(e.target.value)} 
-                />
+                <div style={{ position: 'relative' }}>
+                  <Lock size={18} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input 
+                    type="password" 
+                    className="form-input" 
+                    style={{ paddingLeft: '2.5rem' }}
+                    required 
+                    placeholder="••••••••" 
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)} 
+                  />
+                </div>
               </div>
               <div className="form-group">
                 <label className="form-label">পুনরায় পাসওয়ার্ড</label>
-                <input 
-                  type="password" 
-                  className="form-input" 
-                  required 
-                  placeholder="••••••••" 
-                  value={confirmPassword} 
-                  onChange={e => setConfirmPassword(e.target.value)} 
-                />
+                <div style={{ position: 'relative' }}>
+                  <Lock size={18} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input 
+                    type="password" 
+                    className="form-input" 
+                    style={{ paddingLeft: '2.5rem' }}
+                    required 
+                    placeholder="••••••••" 
+                    value={confirmPassword} 
+                    onChange={e => setConfirmPassword(e.target.value)} 
+                  />
+                </div>
               </div>
             </div>
 
@@ -144,7 +201,7 @@ export const Register = () => {
               type="submit" 
               disabled={submitting} 
               className="btn btn-primary btn-lg" 
-              style={{ width: '100%', marginTop: '0.5rem' }}
+              style={{ width: '100%', marginTop: '0.5rem', justifyContent: 'center' }}
             >
               {submitting ? 'রেজিস্ট্রেশন হচ্ছে...' : 'সাইন আপ করুন'}
             </button>
@@ -158,3 +215,5 @@ export const Register = () => {
     </div>
   );
 };
+
+export default Register;

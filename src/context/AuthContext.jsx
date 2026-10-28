@@ -2,13 +2,17 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { 
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  sendEmailVerification,
   signOut as firebaseSignOut, 
   sendPasswordResetEmail,
   updateProfile
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db, isLiveFirebaseConfigured } from '../config/firebase';
+import { auth, db, googleProvider, isLiveFirebaseConfigured } from '../config/firebase';
 
 const AuthContext = createContext();
 
@@ -61,7 +65,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem(`alamdipara_profile_${uid}`, JSON.stringify(data));
         return data;
       } else {
-        // Document doesn't exist yet in Firestore: self-heal and create it
+        // Document doesn't exist yet in Firestore: create default profile safely
         const isMasterAdmin = authUser?.email && ADMIN_EMAILS.includes(authUser.email.toLowerCase());
         const defaultProfile = {
           uid,
@@ -90,7 +94,6 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.warn("Notice in fetchUserProfile (falling back safely):", err.message);
-      // Fallback: construct safe profile from authUser or cache
       const isMasterAdmin = authUser?.email && ADMIN_EMAILS.includes(authUser.email.toLowerCase());
       return {
         uid,
@@ -104,6 +107,23 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // Process redirect result if signInWithRedirect was used
+    if (isLiveFirebaseConfigured) {
+      getRedirectResult(auth)
+        .then(async (result) => {
+          if (result?.user) {
+            setCurrentUser(result.user);
+            const profile = await fetchUserProfile(result.user.uid, result.user);
+            setUserProfile(profile);
+          }
+        })
+        .catch((err) => {
+          if (err.code !== 'auth/credential-already-in-use') {
+            console.warn("Redirect result notice:", err.message);
+          }
+        });
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
@@ -115,15 +135,8 @@ export const AuthProvider = ({ children }) => {
           roles: ['user']
         });
       } else {
-        // Check for local demo user mode
-        const demoUser = JSON.parse(localStorage.getItem('alamdipara_demo_user') || 'null');
-        if (demoUser) {
-          setCurrentUser({ uid: demoUser.uid, email: demoUser.email, displayName: demoUser.displayName });
-          setUserProfile(demoUser);
-        } else {
-          setCurrentUser(null);
-          setUserProfile(null);
-        }
+        setCurrentUser(null);
+        setUserProfile(null);
       }
       setLoading(false);
     });
@@ -131,72 +144,127 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  // Register User
-  const register = async (email, password, displayName, phone) => {
-    const cleanEmail = email.trim();
-    const cleanName = displayName.trim();
-    const cleanPhone = (phone || '').trim();
-    const isMasterAdmin = ADMIN_EMAILS.includes(cleanEmail.toLowerCase());
+  // 1. Google Sign-In
+  const signInWithGoogle = async () => {
+    if (!isLiveFirebaseConfigured) {
+      throw new Error('Firebase সংযোগ সঠিকভাবে কনফিগার করা নেই।');
+    }
 
     try {
-      if (!isLiveFirebaseConfigured) {
-        const demoUser = {
-          uid: 'demo-user-' + Date.now(),
-          displayName: cleanName,
-          email: cleanEmail,
-          phone: cleanPhone,
-          roles: isMasterAdmin ? ALL_ADMIN_ROLES : ['user'],
-          createdAt: new Date().toISOString()
-        };
-        localStorage.setItem('alamdipara_demo_user', JSON.stringify(demoUser));
-        setCurrentUser({ uid: demoUser.uid, email: cleanEmail, displayName: cleanName });
-        setUserProfile(demoUser);
-        return demoUser;
-      }
-
-      const res = await createUserWithEmailAndPassword(auth, cleanEmail, password);
-      
+      googleProvider.setCustomParameters({ prompt: 'select_account' });
+      let res;
       try {
-        await updateProfile(res.user, { displayName: cleanName });
-      } catch (e) {
-        console.warn("Profile displayName update in Auth:", e);
-      }
-      
-      const newUserData = {
-        uid: res.user.uid,
-        displayName: cleanName,
-        email: cleanEmail,
-        phone: cleanPhone,
-        photoURL: '',
-        bio: '',
-        address: 'আলমদীপাড়া',
-        roles: isMasterAdmin ? ALL_ADMIN_ROLES : ['user'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      // Write to Firestore with catch so auth succeeds even if Firestore rules lag
-      try {
-        await setDoc(doc(db, 'users', res.user.uid), {
-          ...newUserData,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
-      } catch (err) {
-        console.warn("Firestore user document write notice:", err.message);
+        res = await signInWithPopup(auth, googleProvider);
+      } catch (popupErr) {
+        // Fallback to redirect if popup is blocked by browser/mobile
+        if (popupErr.code === 'auth/popup-blocked') {
+          await signInWithRedirect(auth, googleProvider);
+          return null;
+        }
+        throw popupErr;
       }
 
-      localStorage.setItem(`alamdipara_profile_${res.user.uid}`, JSON.stringify(newUserData));
-      setUserProfile(newUserData);
-      return res.user;
-    } catch (error) {
-      throw error;
+      if (res?.user) {
+        const user = res.user;
+        const profile = await fetchUserProfile(user.uid, user);
+        setUserProfile(profile);
+        setCurrentUser(user);
+        return user;
+      }
+      return null;
+    } catch (err) {
+      console.error("Google Sign-In Error:", err);
+      throw err;
     }
+  };
+
+  // 2. Register with Email, Password & Send Verification Email
+  const register = async (email, password, displayName, phone) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = displayName.trim();
+    const cleanPhone = (phone || '').trim();
+    const isMasterAdmin = ADMIN_EMAILS.includes(cleanEmail);
+
+    if (!isLiveFirebaseConfigured) {
+      throw new Error('Firebase সংযোগ সঠিকভাবে কনফিগার করা নেই।');
+    }
+
+    const res = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+    
+    try {
+      await updateProfile(res.user, { displayName: cleanName });
+    } catch (e) {
+      console.warn("Profile displayName update in Auth:", e);
+    }
+    
+    const newUserData = {
+      uid: res.user.uid,
+      displayName: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      photoURL: '',
+      bio: '',
+      address: 'আলমদীপাড়া, বাংলাদেশ',
+      roles: isMasterAdmin ? ALL_ADMIN_ROLES : ['user'],
+      authProvider: 'password',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    // Write to Firestore users collection
+    try {
+      await setDoc(doc(db, 'users', res.user.uid), {
+        ...newUserData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (err) {
+      console.warn("Firestore user document write notice:", err.message);
+    }
+
+    localStorage.setItem(`alamdipara_profile_${res.user.uid}`, JSON.stringify(newUserData));
+    setUserProfile(newUserData);
+    setCurrentUser(res.user);
+
+    // Send verification email link
+    try {
+      const actionCodeSettings = {
+        url: window.location.origin + '/dashboard',
+        handleCodeInApp: false
+      };
+      await sendEmailVerification(res.user, actionCodeSettings);
+    } catch (vErr) {
+      console.warn("sendEmailVerification notice:", vErr.message);
+    }
+
+    return res.user;
+  };
+
+  // 3. Resend Verification Email Link
+  const sendVerificationEmail = async () => {
+    if (!auth.currentUser) {
+      throw new Error('কোনো অ্যাকাউন্ট লগইন করা নেই।');
+    }
+    const actionCodeSettings = {
+      url: window.location.origin + '/dashboard',
+      handleCodeInApp: false
+    };
+    await sendEmailVerification(auth.currentUser, actionCodeSettings);
+  };
+
+  // 4. Refresh Verification Status
+  const refreshVerificationStatus = async () => {
+    if (!auth.currentUser) return false;
+    await auth.currentUser.reload();
+    const refreshed = auth.currentUser;
+    // Trigger React state refresh with a cloned user object
+    setCurrentUser(Object.assign(Object.create(Object.getPrototypeOf(refreshed)), refreshed));
+    return Boolean(refreshed.emailVerified);
   };
 
   // Login User
   const login = async (email, password) => {
-    const cleanEmail = (email || '').trim();
+    const cleanEmail = (email || '').trim().toLowerCase();
 
     if (!isLiveFirebaseConfigured) {
       throw new Error('Firebase সংযোগ সঠিকভাবে কনফিগার করা নেই।');
@@ -208,8 +276,9 @@ export const AuthProvider = ({ children }) => {
       uid: res.user.uid,
       displayName: res.user.displayName || res.user.email?.split('@')[0] || 'গ্রামবাসী',
       email: res.user.email,
-      roles: ADMIN_EMAILS.includes(cleanEmail.toLowerCase()) ? ALL_ADMIN_ROLES : ['user']
+      roles: ADMIN_EMAILS.includes(cleanEmail) ? ALL_ADMIN_ROLES : ['user']
     });
+    setCurrentUser(res.user);
     return res.user;
   };
 
@@ -257,7 +326,6 @@ export const AuthProvider = ({ children }) => {
           updatedAt: serverTimestamp()
         });
       } catch (err) {
-        // If doc doesn't exist, use setDoc
         try {
           await setDoc(doc(db, 'users', uid), {
             ...merged,
@@ -291,12 +359,22 @@ export const AuthProvider = ({ children }) => {
     updateUserProfile(updatedFields);
   };
 
+  // Google sign-in users are verified by Google; password users need emailVerified === true
+  const isGoogleUser = Boolean(
+    currentUser?.providerData?.some(p => p.providerId === 'google.com')
+  );
+  const isEmailVerified = Boolean(currentUser?.emailVerified || isGoogleUser);
+
   const value = {
     currentUser,
     userProfile,
     loading,
     register,
     login,
+    signInWithGoogle,
+    sendVerificationEmail,
+    refreshVerificationStatus,
+    isEmailVerified,
     logout,
     resetPassword,
     updateUserProfile,

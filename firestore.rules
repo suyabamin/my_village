@@ -12,6 +12,14 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    // Email verification check (Google users are automatically verified; password users need email_verified claim)
+    function isVerified() {
+      return isSignedIn() && (
+        request.auth.token.email_verified == true || 
+        request.auth.token.firebase.sign_in_provider == 'google.com'
+      );
+    }
+
     // Safe getUserData — returns null if user doc doesn't exist (no crash)
     function getUserData() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
@@ -65,30 +73,30 @@ service cloud.firestore {
     }
     match /agricultural_machines/{machineId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.createdBy) || isSuperAdmin();
+      allow create: if isVerified();
+      allow update, delete: if (isOwner(resource.data.createdBy) && isVerified()) || isSuperAdmin();
     }
     match /land_leases/{leaseId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.createdBy) || isSuperAdmin();
+      allow create: if isVerified();
+      allow update, delete: if (isOwner(resource.data.createdBy) && isVerified()) || isSuperAdmin();
     }
     
     // ─── Sports: Tournaments ─────────────────────────────────────────────────
     match /tournaments/{tId} {
       allow read: if true;
-      allow create: if isSignedIn();
+      allow create: if isVerified();
       // Only the owner or game_admin/super_admin can update/delete
-      allow update: if isOwner(resource.data.createdBy) || hasRole('game_admin');
-      allow delete: if isOwner(resource.data.createdBy) || isSuperAdmin();
+      allow update: if (isOwner(resource.data.createdBy) && isVerified()) || hasRole('game_admin');
+      allow delete: if (isOwner(resource.data.createdBy) && isVerified()) || isSuperAdmin();
     }
 
     // ─── Sports: Team Registrations ──────────────────────────────────────────
     match /tournament_registrations/{regId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
+      allow create: if isVerified();
       // Only registrant, game_admin, or super_admin can approve/reject/delete
-      allow update, delete: if isOwner(resource.data.registeredBy) 
+      allow update, delete: if (isOwner(resource.data.registeredBy) && isVerified()) 
                             || hasRole('game_admin') 
                             || isSuperAdmin();
     }
@@ -97,15 +105,15 @@ service cloud.firestore {
     match /matches/{matchId} {
       allow read: if true;
       // Only game_admin or super_admin can create/update/delete matches
-      allow create: if isSignedIn();
+      allow create: if isVerified();
       allow update, delete: if hasRole('game_admin') || isSuperAdmin();
     }
 
     // ─── Sports: Teams ───────────────────────────────────────────────────────
     match /teams/{teamId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.createdBy) || hasRole('game_admin');
+      allow create: if isVerified();
+      allow update, delete: if (isOwner(resource.data.createdBy) && isVerified()) || hasRole('game_admin');
     }
 
     // ─── Sports: Live Scores (real-time scoring, only signed-in) ─────────────

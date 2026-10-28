@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
+import GoogleSignInButton from '../components/auth/GoogleSignInButton';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -55,10 +56,14 @@ export const Login = () => {
     }
   };
 
+  const handleGoogleSuccess = () => {
+    navigate(from, { replace: true });
+  };
+
   return (
     <div className="auth-page-wrapper">
       <div className="auth-card">
-        <div className="card animate-fade-in" style={{ padding: 'clamp(1.5rem, 5vw, 2rem)' }}>
+        <div className="card animate-fade-in" style={{ padding: 'clamp(1.5rem, 5vw, 2.25rem)' }}>
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             <div style={{
               width: '48px',
@@ -79,6 +84,27 @@ export const Login = () => {
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>আলমদীপাড়া ডিজিটাল গ্রাম প্ল্যাটফর্ম</p>
           </div>
 
+          {/* 1. Continue with Google Button */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <GoogleSignInButton 
+              onSuccess={handleGoogleSuccess}
+              text="গুগল দিয়ে এগিয়ে যান" 
+            />
+          </div>
+
+          {/* Or Divider */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: '1.25rem 0',
+            color: 'var(--text-muted)',
+            fontSize: '0.85rem'
+          }}>
+            <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border-color, #e5e7eb)' }} />
+            <span style={{ padding: '0 0.75rem' }}>অথবা ইমেইল দিয়ে প্রবেশ করুন</span>
+            <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border-color, #e5e7eb)' }} />
+          </div>
+
           {errorMessage && (
             <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '8px', marginBottom: '1.25rem', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <AlertCircle size={18} style={{ flexShrink: 0 }} /> <span>{errorMessage}</span>
@@ -95,7 +121,7 @@ export const Login = () => {
                   className="form-input"
                   style={{ paddingLeft: '2.5rem' }}
                   required
-                  placeholder="name@example.com"
+                  placeholder="name@gmail.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
@@ -127,7 +153,7 @@ export const Login = () => {
               type="submit"
               disabled={submitting}
               className="btn btn-primary btn-lg"
-              style={{ width: '100%', marginTop: '0.5rem' }}
+              style={{ width: '100%', marginTop: '0.5rem', justifyContent: 'center' }}
             >
               {submitting ? 'লগইন হচ্ছে...' : 'লগইন করুন'}
             </button>
@@ -141,3 +167,5 @@ export const Login = () => {
     </div>
   );
 };
+
+export default Login;

@@ -8,7 +8,7 @@ import { useNotification } from '../context/NotificationContext';
 
 export const Sports = () => {
   const navigate = useNavigate();
-  const { currentUser, userProfile } = useAuth();
+  const { currentUser, userProfile, isEmailVerified } = useAuth();
   const { addToast } = useNotification();
 
   const [tournaments, setTournaments] = useState([]);
@@ -77,6 +77,12 @@ export const Sports = () => {
     if (!currentUser) {
       addToast('টুর্নামেন্ট তৈরি করতে লগইন থাকা আবশ্যক।', 'error');
       navigate('/login');
+      return;
+    }
+
+    if (!isEmailVerified) {
+      addToast('টুর্নামেন্ট আয়োজন করতে আপনার ইমেইল ভেরিফাই করা আবশ্যক।', 'error');
+      navigate('/verify-email');
       return;
     }
 

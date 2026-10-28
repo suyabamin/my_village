@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Download, CheckCircle2, Phone, Calendar, UserCheck, Plus, Trash2, Shield, Eye } from 'lucide-react';
 import { getTournamentById, registerTeam, getTournamentRegistrations, getTournamentMatches } from '../services/sportsService';
 import { uploadFreeImage } from '../services/imageService';
@@ -9,7 +9,8 @@ import html2pdf from 'html2pdf.js';
 
 export const TournamentDetail = () => {
   const { id } = useParams();
-  const { currentUser, userProfile } = useAuth();
+  const navigate = useNavigate();
+  const { currentUser, userProfile, isEmailVerified } = useAuth();
   const { addToast } = useNotification();
 
   const [tournament, setTournament] = useState(null);
@@ -111,6 +112,13 @@ export const TournamentDetail = () => {
     e.preventDefault();
     if (!currentUser) {
       addToast('দল রেজিস্ট্রেশন করতে হলে একাউন্টে লগইন করুন।', 'error');
+      navigate('/login');
+      return;
+    }
+
+    if (!isEmailVerified) {
+      addToast('দল রেজিস্ট্রেশন করতে আপনার ইমেইল ভেরিফাই করা আবশ্যক।', 'error');
+      navigate('/verify-email');
       return;
     }
 

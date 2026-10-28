@@ -26,6 +26,7 @@ const WeatherPage = lazy(() => import('../pages/WeatherPage'));
 const Login = lazy(() => import('../pages/Login').then(m => ({ default: m.Login })));
 const Register = lazy(() => import('../pages/Register').then(m => ({ default: m.Register })));
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
+const VerifyEmail = lazy(() => import('../pages/VerifyEmail').then(m => ({ default: m.VerifyEmail })));
 const Profile = lazy(() => import('../pages/Profile').then(m => ({ default: m.Profile })));
 const Dashboard = lazy(() => import('../pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const Admin = lazy(() => import('../pages/Admin').then(m => ({ default: m.Admin })));
@@ -70,6 +71,7 @@ export const AppRoutes = () => {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="verify-email" element={<VerifyEmail />} />
 
           {/* Protected Routes */}
           <Route 

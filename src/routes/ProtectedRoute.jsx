@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export const ProtectedRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, isEmailVerified, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -16,6 +16,11 @@ export const ProtectedRoute = ({ children }) => {
 
   if (!currentUser) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // If user registered with email/password and hasn't verified email, direct to verification page
+  if (!isEmailVerified) {
+    return <Navigate to="/verify-email" state={{ from: location }} replace />;
   }
 
   return children;

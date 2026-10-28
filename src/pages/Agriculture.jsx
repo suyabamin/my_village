@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Sprout, Wrench, FileText, Plus, Phone, Calendar, Clock, MapPin, Tag } from 'lucide-react';
 import { getCollectionData, addDocument, initialVillageData } from '../services/dbService';
 import { useAuth } from '../context/AuthContext';
@@ -7,8 +7,9 @@ import { useNotification } from '../context/NotificationContext';
 import { ImageUploader } from '../components/common/ImageUploader';
 
 export const Agriculture = () => {
-  const { currentUser, userProfile } = useAuth();
+  const { currentUser, userProfile, isEmailVerified } = useAuth();
   const { addToast } = useNotification();
+  const navigate = useNavigate();
   
   const [fields, setFields] = useState(initialVillageData.agriculture_fields);
   const [machines, setMachines] = useState([]);
@@ -57,6 +58,11 @@ export const Agriculture = () => {
 
   const handleCreateMachine = async (e) => {
     e.preventDefault();
+    if (!isEmailVerified) {
+      addToast('পোস্ট করার পূর্বে অনুগ্রহ করে আপনার ইমেইল ভেরিফাই করুন।', 'error');
+      navigate('/verify-email');
+      return;
+    }
     if (!machineForm.name || !machineForm.price || !machineForm.phone) {
       addToast('অনুগ্রহ করে প্রয়োজনীয় তথ্যসমূহ প্রদান করুন।', 'error');
       return;
@@ -79,6 +85,11 @@ export const Agriculture = () => {
 
   const handleCreateLease = async (e) => {
     e.preventDefault();
+    if (!isEmailVerified) {
+      addToast('পোস্ট করার পূর্বে অনুগ্রহ করে আপনার ইমেইল ভেরিফাই করুন।', 'error');
+      navigate('/verify-email');
+      return;
+    }
     if (!leaseForm.landAmount || !leaseForm.price || !leaseForm.phone) {
       addToast('অনুগ্রহ করে প্রয়োজনীয় ঘরগুলো পূরণ করুন।', 'error');
       return;

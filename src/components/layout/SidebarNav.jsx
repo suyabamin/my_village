@@ -35,7 +35,7 @@ export const SidebarNav = () => {
     { label: 'ধর্মীয় অনুষ্ঠান', path: '/religious-events', icon: Moon },
   ];
 
-  const hasAdminRole = userProfile?.roles?.length > 0;
+  const hasAdminRole = userProfile?.roles?.some(r => r.endsWith('_admin') || r === 'super_admin');
 
   return (
     <aside className="sidebar" aria-label="সাইডবার নেভিগেশন">

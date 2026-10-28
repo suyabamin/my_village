@@ -5,6 +5,7 @@ import { SidebarNav } from '../components/layout/SidebarNav';
 import { Footer } from '../components/layout/Footer';
 import { MobileNav } from '../components/layout/MobileNav';
 import { MobileBottomBar } from '../components/layout/MobileBottomBar';
+import { EditModeBar } from '../components/common/EditModeBar';
 
 export const MainLayout = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -26,6 +27,9 @@ export const MainLayout = () => {
       {/* 3. Mobile Drawer & Mobile Bottom Bar Navigation */}
       <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
       <MobileBottomBar />
+
+      {/* 4. Super Admin Inline Edit Mode Indicator */}
+      <EditModeBar />
     </div>
   );
 };

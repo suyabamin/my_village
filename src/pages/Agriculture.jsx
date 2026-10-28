@@ -11,8 +11,8 @@ export const Agriculture = () => {
   const { addToast } = useNotification();
   
   const [fields, setFields] = useState(initialVillageData.agriculture_fields);
-  const [machines, setMachines] = useState(initialVillageData.agricultural_machines);
-  const [leases, setLeases] = useState(initialVillageData.land_leases);
+  const [machines, setMachines] = useState([]);
+  const [leases, setLeases] = useState([]);
   const [activeTab, setActiveTab] = useState('fields'); // 'fields' | 'machines' | 'leases'
 
   // Machine Modal Form state
@@ -48,11 +48,11 @@ export const Agriculture = () => {
 
   useEffect(() => {
     getCollectionData('agricultural_machines').then(res => {
-      if (res && res.length > 0) setMachines(res);
-    });
+      setMachines(res || []);
+    }).catch(() => setMachines([]));
     getCollectionData('land_leases').then(res => {
-      if (res && res.length > 0) setLeases(res);
-    });
+      setLeases(res || []);
+    }).catch(() => setLeases([]));
   }, []);
 
   const handleCreateMachine = async (e) => {

@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { EditModeProvider } from './context/EditModeContext';
 import { AppRoutes } from './routes/AppRoutes';
 
 export default function App() {
@@ -10,9 +11,11 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <NotificationProvider>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
+          <EditModeProvider>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </EditModeProvider>
         </NotificationProvider>
       </AuthProvider>
     </ThemeProvider>

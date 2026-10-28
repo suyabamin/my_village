@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { ShieldAlert, Bell, Calendar, MapPin, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldAlert, Bell, Calendar, MapPin, AlertTriangle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
+import { getCollectionData } from '../services/dbService';
 
 export const Emergency = () => {
   const { hasRole } = useAuth();
@@ -10,17 +11,19 @@ export const Emergency = () => {
     Notification.permission === 'granted'
   );
 
-  const [emergencies] = useState([
-    {
-      id: 'e-1',
-      title: 'জরুরি গ্রাম প্রতিরক্ষা ও নদী বাঁধ পরিদর্শন মিটিং',
-      date: '২০২৬-০৯-১০',
-      time: 'সন্ধ্যা ৭:৩০ PM',
-      location: 'আলমদীপাড়া যুব সংঘ কার্যালয় প্রাঙ্গণ',
-      instructions: 'গ্রামের প্রতি পরিবার থেকে অন্তত ১ জন প্রাপ্তবয়স্ক প্রতিনিধিকে উপস্থিতি থাকার অনুরোধ করা যাচ্ছে।',
-      poster: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80'
-    }
-  ]);
+  const [emergencies, setEmergencies] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getCollectionData('emergency_meetings').then(res => {
+      setEmergencies(res || []);
+    }).catch(err => {
+      console.warn("Emergency meetings fetch notice:", err);
+      setEmergencies([]);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }, []);
 
   const requestNotificationPermission = async () => {
     try {
@@ -76,29 +79,46 @@ export const Emergency = () => {
         </div>
       </div>
 
-      <div className="home-cards-grid">
-        {emergencies.map(e => (
-          <div key={e.id} className="card" style={{ borderLeft: '5px solid #ef4444' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <span className="badge badge-red">🚨 জরুরি আহ্বান</span>
-              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>জরুরি সভা</span>
-            </div>
+      {loading ? (
+        <div style={{ padding: '3rem', textAlign: 'center' }}>
+          <Loader2 size={32} className="animate-spin" style={{ margin: '0 auto 0.5rem', color: '#ef4444' }} />
+          <div>জরুরি নোটিশ লোড হচ্ছে...</div>
+        </div>
+      ) : emergencies.length === 0 ? (
+        <div className="card" style={{ padding: '3rem 1.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+          <ShieldAlert size={40} style={{ margin: '0 auto 0.75rem', color: '#16a34a', opacity: 0.8 }} />
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '0.4rem', color: 'var(--text-main)' }}>
+            বর্তমানে কোনো জরুরি সভা বা সতর্কতা বিজ্ঞপ্তি নেই
+          </h3>
+          <p style={{ fontSize: '0.9rem' }}>
+            আলমদীপাড়া গ্রামে বর্তমানে কোনো আপৎকালীন সতর্কতা জারি নেই।
+          </p>
+        </div>
+      ) : (
+        <div className="home-cards-grid">
+          {emergencies.map(e => (
+            <div key={e.id} className="card" style={{ borderLeft: '5px solid #ef4444' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <span className="badge badge-red">🚨 জরুরি আহ্বান</span>
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>জরুরি সভা</span>
+              </div>
 
-            <h2 style={{ fontSize: '1.35rem', fontWeight: '800', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
-              {e.title}
-            </h2>
+              <h2 style={{ fontSize: '1.35rem', fontWeight: '800', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                {e.title}
+              </h2>
 
-            <div style={{ fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', color: 'var(--text-main)', backgroundColor: 'var(--bg-elevated)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem' }}>
-              <div><Calendar size={14} /> <strong>তারিখ ও সময়:</strong> {e.date} ({e.time})</div>
-              <div><MapPin size={14} /> <strong>স্থান:</strong> {e.location}</div>
-            </div>
+              <div style={{ fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', color: 'var(--text-main)', backgroundColor: 'var(--bg-elevated)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem' }}>
+                <div><Calendar size={14} /> <strong>তারিখ ও সময়:</strong> {e.date} ({e.time})</div>
+                <div><MapPin size={14} /> <strong>স্থান:</strong> {e.location}</div>
+              </div>
 
-            <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', borderRadius: '8px', color: '#991b1b', fontSize: '0.88rem', fontWeight: '500' }}>
-              <strong>উপস্থিতি নির্দেশনা:</strong> {e.instructions}
+              <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', borderRadius: '8px', color: '#991b1b', fontSize: '0.88rem', fontWeight: '500' }}>
+                <strong>উপস্থিতি নির্দেশনা:</strong> {e.instructions}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
     </div>
   );

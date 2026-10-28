@@ -21,10 +21,12 @@ import {
   AlertTriangle,
   Trophy,
   Sprout,
-  Calendar
+  Calendar,
+  Edit3
 } from 'lucide-react';
 import ProfileAvatar from '../profile/ProfileAvatar';
 import { HeaderSearchModal } from './HeaderSearchModal';
+import { useEditMode } from '../../context/EditModeContext';
 
 /* ─────────────────────────────────────────────────────────────
    Notification type → icon + colour mapping
@@ -55,8 +57,9 @@ function formatRelativeTime(ts) {
    Main Header Component
 ───────────────────────────────────────────────────────────── */
 export const Header = ({ onOpenMobileNav }) => {
-  const { currentUser, userProfile, logout } = useAuth();
+  const { currentUser, userProfile, logout, isSuperAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { editModeEnabled, toggleEditMode } = useEditMode();
   const { notifications, unreadCount, markRead, markAllRead, setNotificationUser } = useNotification();
   const location  = useLocation();
   const navigate  = useNavigate();
@@ -291,6 +294,23 @@ export const Header = ({ onOpenMobileNav }) => {
               </div>
             )}
           </div>
+
+          {/* ── Super Admin Edit Mode Toggle ───────────────── */}
+          {isSuperAdmin && (
+            <button
+              className="icon-btn"
+              onClick={toggleEditMode}
+              aria-label={editModeEnabled ? 'এডিট মোড বন্ধ করুন' : 'সুপার এডমিন এডিট মোড চালু করুন'}
+              title={editModeEnabled ? 'এডিট মোড বন্ধ করুন' : 'সুপার এডমিন এডিট মোড চালু করুন'}
+              style={{
+                backgroundColor: editModeEnabled ? '#16a34a' : 'transparent',
+                color: editModeEnabled ? '#ffffff' : 'inherit',
+                borderColor: editModeEnabled ? '#15803d' : 'rgba(255, 255, 255, 0.2)'
+              }}
+            >
+              <Edit3 size={17} />
+            </button>
+          )}
 
           {/* ── Theme Toggle ───────────────────────────────── */}
           <button

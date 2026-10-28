@@ -4,10 +4,12 @@ import { useNotification } from '../context/NotificationContext';
 import { Shield, Users, Settings, FileText, CheckCircle2, Loader2, UserCheck, Image as ImageIcon, Trophy, Check, X } from 'lucide-react';
 import { getCollectionData, updateDocument, initialVillageData } from '../services/dbService';
 import { getTournaments, updateTournamentStatus } from '../services/sportsService';
+import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import VillageImageAdminManager from '../components/village/VillageImageAdminManager';
 
 export const Admin = () => {
-  const { isSuperAdmin, currentUser } = useAuth();
+  const { isSuperAdmin, currentUser, userProfile } = useAuth();
   const { addToast } = useNotification();
 
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roles' | 'tournaments' | 'settings' | 'village_images' | 'audit'
@@ -23,29 +25,37 @@ export const Admin = () => {
   const [pendingTournaments, setPendingTournaments] = useState([]);
 
   // Audit Logs State
-  const [auditLogs, setAuditLogs] = useState([
-    { id: 'log-1', adminName: 'এডমিন (সুপার)', action: 'রোল অর্পণ', targetDoc: 'rahim@alamdipara.com (game_admin)', timestamp: '২০২৬-০৯-০২ ১৬:৩০' },
-    { id: 'log-2', adminName: 'এডমিন (সুপার)', action: 'ঘোষণা হালনাগাদ', targetDoc: 'সাইট ঘোষণা পাঠ্য পরিবর্তন', timestamp: '২০২৬-০৯-০২ ১৪:১৫' }
-  ]);
+  const [auditLogs, setAuditLogs] = useState([]);
 
   const loadData = async () => {
     setLoadingUsers(true);
     try {
       const data = await getCollectionData('users');
-      if (data && data.length > 0) {
-        setUserList(data);
-      } else {
-        setUserList([
-          { uid: 'demo-u-1', displayName: 'আব্দুর রহিম', email: 'rahim@alamdipara.com', phone: '01711223344', roles: ['game_admin'] },
-          { uid: 'demo-u-2', displayName: 'মাওলানা ইসমাইল', email: 'ismail@alamdipara.com', phone: '01722334455', roles: ['mosque_admin'] },
-          { uid: 'demo-u-3', displayName: 'মোঃ রফিকুল ইসলাম', email: 'rofiq@alamdipara.com', phone: '01733445566', roles: ['education_admin'] }
-        ]);
-      }
+      setUserList(data || []);
 
       const tList = await getTournaments('pending');
-      setPendingTournaments(tList);
+      setPendingTournaments(tList || []);
+
+      // Load real audit logs from Firestore
+      try {
+        const logs = await getCollectionData('admin_logs');
+        setAuditLogs(logs || []);
+      } catch (e) {
+        setAuditLogs([]);
+      }
+
+      // Load real site settings from Firestore
+      try {
+        const settingsDoc = await getDoc(doc(db, 'site_settings', 'general'));
+        if (settingsDoc.exists()) {
+          setSiteSettings(settingsDoc.data());
+        }
+      } catch (e) {
+        console.warn("Settings fetch notice:", e);
+      }
     } catch (err) {
       console.error("Error fetching admin data:", err);
+      setUserList([]);
     } finally {
       setLoadingUsers(false);
     }
@@ -79,8 +89,13 @@ export const Admin = () => {
     }
   };
 
-  // Toggle and assign/remove role for a user
+  // Toggle and assign/remove role for a user (Only Super Admin)
   const handleToggleUserRole = async (user, roleName) => {
+    if (!isSuperAdmin) {
+      addToast('শুধুমাত্র সুপার এডমিন রোল পরিবর্তন করতে পারেন।', 'error');
+      return;
+    }
+
     const currentRoles = user.roles || [];
     const has = currentRoles.includes(roleName);
     const updatedRoles = has 
@@ -99,11 +114,22 @@ export const Admin = () => {
 
     const logItem = {
       id: 'log-' + Date.now(),
-      adminName: 'এডমিন (সুপার)',
+      adminId: currentUser?.uid || 'super_admin',
+      adminName: userProfile?.displayName || 'এডমিন (সুপার)',
       action: has ? 'রোল অপসারণ' : 'রোল অর্পণ',
       targetDoc: `${user.email || user.displayName} (${roleName})`,
       timestamp: new Date().toLocaleString('bn-BD')
     };
+
+    try {
+      await addDoc(collection(db, 'admin_logs'), {
+        ...logItem,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) {
+      console.warn("Audit log save error:", e);
+    }
+
     setAuditLogs(prev => [logItem, ...prev]);
 
     addToast(`"${user.displayName || user.email}"-এর জন্য ${roleName} রোল ${has ? 'সরানো হয়েছে' : 'যোগ করা হয়েছে'}!`, 'success');
@@ -253,6 +279,10 @@ export const Admin = () => {
               <Loader2 size={32} className="animate-spin" style={{ margin: '0 auto 0.5rem', color: 'var(--color-primary-600)' }} />
               <div>তালিকা লোড হচ্ছে...</div>
             </div>
+          ) : userList.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+              কোনো নিবন্ধিত ব্যবহারকারী পাওয়া যায়নি।
+            </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {userList.map(u => (
@@ -352,28 +382,34 @@ export const Admin = () => {
           <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '1rem' }}>
             অডিট ইতিহাস (System Audit Trail)
           </h2>
-          <div className="table-responsive">
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid var(--border-color)', backgroundColor: 'var(--bg-elevated)' }}>
-                  <th style={{ padding: '0.65rem' }}>সময়</th>
-                  <th style={{ padding: '0.65rem' }}>এডমিন</th>
-                  <th style={{ padding: '0.65rem' }}>অ্যাকশন</th>
-                  <th style={{ padding: '0.65rem' }}>বিবরণ</th>
-                </tr>
-              </thead>
-              <tbody>
-                {auditLogs.map(log => (
-                  <tr key={log.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td style={{ padding: '0.65rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{log.timestamp}</td>
-                    <td style={{ padding: '0.65rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{log.adminName}</td>
-                    <td style={{ padding: '0.65rem' }}><span className="badge badge-blue">{log.action}</span></td>
-                    <td style={{ padding: '0.65rem' }}>{log.targetDoc}</td>
+          {auditLogs.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+              কোনো সিস্টেম অডিট লগ পাওয়া যায়নি।
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border-color)', backgroundColor: 'var(--bg-elevated)' }}>
+                    <th style={{ padding: '0.65rem' }}>সময়</th>
+                    <th style={{ padding: '0.65rem' }}>এডমিন</th>
+                    <th style={{ padding: '0.65rem' }}>অ্যাকশন</th>
+                    <th style={{ padding: '0.65rem' }}>বিবরণ</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {auditLogs.map(log => (
+                    <tr key={log.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <td style={{ padding: '0.65rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{log.timestamp}</td>
+                      <td style={{ padding: '0.65rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{log.adminName}</td>
+                      <td style={{ padding: '0.65rem' }}><span className="badge badge-blue">{log.action}</span></td>
+                      <td style={{ padding: '0.65rem' }}>{log.targetDoc || log.details}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 

@@ -24,6 +24,7 @@ export const MobileNav = ({ isOpen, onClose }) => {
   const { currentUser, userProfile, logout } = useAuth();
   const location = useLocation();
   const drawerRef = useRef(null);
+  const hasAdminRole = userProfile?.roles?.some(r => r.endsWith('_admin') || r === 'super_admin');
 
   // Close on route change
   useEffect(() => {
@@ -282,7 +283,7 @@ export const MobileNav = ({ isOpen, onClose }) => {
               <User size={19} aria-hidden="true" color="var(--text-muted)" />
               প্রোফাইল
             </Link>
-            {userProfile?.roles?.length > 0 && (
+            {hasAdminRole && (
               <Link
                 to="/admin"
                 style={{

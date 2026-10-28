@@ -38,13 +38,12 @@ export const AuthProvider = ({ children }) => {
       let fallbackProfile = cached ? JSON.parse(cached) : null;
 
       if (!isLiveFirebaseConfigured) {
-        const localProfile = JSON.parse(localStorage.getItem('alamdipara_demo_user') || 'null');
-        return localProfile || fallbackProfile || {
+        return fallbackProfile || {
           uid,
           displayName: authUser?.displayName || 'আলমদীপাড়া নাগরিক',
-          email: authUser?.email || 'demo@alamdipara.gov.bd',
-          phone: '01700000000',
-          roles: ALL_ADMIN_ROLES
+          email: authUser?.email || '',
+          phone: '',
+          roles: authUser?.email && ADMIN_EMAILS.includes(authUser.email.toLowerCase()) ? ALL_ADMIN_ROLES : ['user']
         };
       }
 
@@ -199,57 +198,23 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const cleanEmail = (email || '').trim();
 
-    // Check for quick demo login shortcut
-    if (cleanEmail === 'admin@alamdipara.gov.bd' && password === 'admin123') {
-      return demoLogin('admin');
+    if (!isLiveFirebaseConfigured) {
+      throw new Error('Firebase সংযোগ সঠিকভাবে কনফিগার করা নেই।');
     }
 
-    try {
-      if (!isLiveFirebaseConfigured) {
-        return demoLogin('admin');
-      }
-
-      const res = await signInWithEmailAndPassword(auth, cleanEmail, password);
-      const profile = await fetchUserProfile(res.user.uid, res.user);
-      setUserProfile(profile || {
-        uid: res.user.uid,
-        displayName: res.user.displayName || res.user.email?.split('@')[0] || 'গ্রামবাসী',
-        email: res.user.email,
-        roles: ADMIN_EMAILS.includes(cleanEmail.toLowerCase()) ? ALL_ADMIN_ROLES : ['user']
-      });
-      return res.user;
-    } catch (error) {
-      // If user typed admin demo credentials and live auth failed, provide demo admin fallback
-      if (cleanEmail === 'admin@alamdipara.gov.bd') {
-        return demoLogin('admin');
-      }
-      throw error;
-    }
-  };
-
-  // Quick Demo Login for instant testing without getting blocked
-  const demoLogin = (roleType = 'admin') => {
-    const isSuper = roleType === 'admin';
-    const demoUser = {
-      uid: isSuper ? 'demo-admin-id' : 'demo-citizen-id',
-      displayName: isSuper ? 'মো. সুয়াইব আমিন (সুপার এডমিন)' : 'আব্দুল করিম (নাগরিক)',
-      email: isSuper ? 'admin@alamdipara.gov.bd' : 'citizen@alamdipara.gov.bd',
-      phone: '01711223344',
-      bio: isSuper ? 'আলমদীপাড়া ডিজিটাল গ্রাম পরিচালনা পর্ষদের প্রধান।' : 'আলমদীপাড়া গ্রামের একজন সচেতন নাগরিক।',
-      address: 'উত্তর পাড়া, আলমদীপাড়া',
-      roles: isSuper ? ALL_ADMIN_ROLES : ['user'],
-      createdAt: new Date().toISOString()
-    };
-    localStorage.setItem('alamdipara_demo_user', JSON.stringify(demoUser));
-    localStorage.setItem(`alamdipara_profile_${demoUser.uid}`, JSON.stringify(demoUser));
-    setCurrentUser({ uid: demoUser.uid, email: demoUser.email, displayName: demoUser.displayName });
-    setUserProfile(demoUser);
-    return demoUser;
+    const res = await signInWithEmailAndPassword(auth, cleanEmail, password);
+    const profile = await fetchUserProfile(res.user.uid, res.user);
+    setUserProfile(profile || {
+      uid: res.user.uid,
+      displayName: res.user.displayName || res.user.email?.split('@')[0] || 'গ্রামবাসী',
+      email: res.user.email,
+      roles: ADMIN_EMAILS.includes(cleanEmail.toLowerCase()) ? ALL_ADMIN_ROLES : ['user']
+    });
+    return res.user;
   };
 
   // Logout
   const logout = async () => {
-    localStorage.removeItem('alamdipara_demo_user');
     if (currentUser?.uid) {
       localStorage.removeItem(`alamdipara_profile_${currentUser.uid}`);
     }
@@ -321,16 +286,6 @@ export const AuthProvider = ({ children }) => {
     return userProfile.roles.includes('super_admin') || userProfile.roles.includes(role);
   };
 
-  // Quick helper for dev mode role switching
-  const switchDemoRole = (roleList) => {
-    const updated = { ...userProfile, roles: roleList };
-    setUserProfile(updated);
-    localStorage.setItem('alamdipara_demo_user', JSON.stringify(updated));
-    if (currentUser?.uid) {
-      localStorage.setItem(`alamdipara_profile_${currentUser.uid}`, JSON.stringify(updated));
-    }
-  };
-
   // Helper to update local user profile state in real-time
   const updateUserProfileState = (updatedFields) => {
     updateUserProfile(updatedFields);
@@ -342,13 +297,11 @@ export const AuthProvider = ({ children }) => {
     loading,
     register,
     login,
-    demoLogin,
     logout,
     resetPassword,
     updateUserProfile,
     updateUserProfileState,
     hasRole,
-    switchDemoRole,
     isSuperAdmin: hasRole('super_admin')
   };
 

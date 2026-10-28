@@ -29,6 +29,7 @@ import { subscribeLiveMatches } from '../services/sportsService';
 import { fetchVillageWeather, toBengaliNumber } from '../services/weatherService';
 import { fetchActiveVillageImages } from '../services/villageCommonImageService';
 import { VillageMap } from '../components/map/VillageMap';
+import { EditableText } from '../components/common/EditableText';
 
 export const Home = () => {
   const [siteSettings, setSiteSettings] = useState(initialVillageData.site_settings);
@@ -340,11 +341,26 @@ export const Home = () => {
         >
           <div className="hero-text">
             <h2>
-              {siteSettings?.heroTitle || 'আলমদীপাড়া ডিজিটাল গ্রামে'}<br />
+              <EditableText
+                value={siteSettings?.heroTitle || 'আলমদীপাড়া ডিজিটাল গ্রামে'}
+                collection="site_settings"
+                docId={siteSettings?.id || 'general'}
+                field="heroTitle"
+                onSaved={(val) => setSiteSettings(prev => ({ ...prev, heroTitle: val }))}
+              />
+              <br />
               আপনাকে স্বাগতম!
             </h2>
             <p>
-              <Quote size={16} /> "{siteSettings?.heroSubtitle || 'গ্রামের উন্নয়ন, প্রগতির ছোঁয়ায়'}"
+              <Quote size={16} /> "
+              <EditableText
+                value={siteSettings?.heroSubtitle || 'গ্রামের উন্নয়ন, প্রগতির ছোঁয়ায়'}
+                collection="site_settings"
+                docId={siteSettings?.id || 'general'}
+                field="heroSubtitle"
+                onSaved={(val) => setSiteSettings(prev => ({ ...prev, heroSubtitle: val }))}
+              />
+              "
             </p>
           </div>
 

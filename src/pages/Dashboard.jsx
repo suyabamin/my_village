@@ -3,20 +3,22 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { LayoutDashboard, Wrench, FileText, Shield, Trash2, Plus, Trophy, Tv, Radio } from 'lucide-react';
-import { initialVillageData } from '../services/dbService';
+import { getCollectionData, deleteDocument } from '../services/dbService';
 import { subscribeLiveMatches, getTournaments } from '../services/sportsService';
 
 import VillageCommonImageSlider from '../components/village/VillageCommonImageSlider';
 
 export const Dashboard = () => {
-  const { currentUser, userProfile, switchDemoRole } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const { addToast } = useNotification();
 
-  const [myMachines, setMyMachines] = useState(initialVillageData.agricultural_machines);
-  const [myLeases, setMyLeases] = useState(initialVillageData.land_leases);
+  const [myMachines, setMyMachines] = useState([]);
+  const [myLeases, setMyLeases] = useState([]);
   const [deleteModalItem, setDeleteModalItem] = useState(null);
   const [liveMatches, setLiveMatches] = useState([]);
   const [myTournaments, setMyTournaments] = useState([]);
+
+  const hasAdminRole = userProfile?.roles?.some(r => r.endsWith('_admin') || r === 'super_admin');
 
   useEffect(() => {
     // Subscribe to live matches
@@ -26,22 +28,39 @@ export const Dashboard = () => {
 
     if (currentUser) {
       getTournaments().then(all => {
-        const userT = all.filter(t => t.createdBy === currentUser.uid);
+        const userT = (all || []).filter(t => t.createdBy === currentUser.uid);
         setMyTournaments(userT);
+      });
+
+      getCollectionData('agricultural_machines').then(res => {
+        const mine = (res || []).filter(m => m.createdBy === currentUser.uid);
+        setMyMachines(mine);
+      });
+
+      getCollectionData('land_leases').then(res => {
+        const mine = (res || []).filter(l => l.createdBy === currentUser.uid);
+        setMyLeases(mine);
       });
     }
 
     return () => unSubMatches();
   }, [currentUser]);
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!deleteModalItem) return;
-    if (deleteModalItem.type === 'machine') {
-      setMyMachines(prev => prev.filter(m => m.id !== deleteModalItem.id));
-    } else if (deleteModalItem.type === 'lease') {
-      setMyLeases(prev => prev.filter(l => l.id !== deleteModalItem.id));
+    try {
+      if (deleteModalItem.type === 'machine') {
+        await deleteDocument('agricultural_machines', deleteModalItem.id);
+        setMyMachines(prev => prev.filter(m => m.id !== deleteModalItem.id));
+      } else if (deleteModalItem.type === 'lease') {
+        await deleteDocument('land_leases', deleteModalItem.id);
+        setMyLeases(prev => prev.filter(l => l.id !== deleteModalItem.id));
+      }
+      addToast('পোস্টটি সফলভাবে মুছে ফেলা হয়েছে।', 'success');
+    } catch (e) {
+      console.warn("Delete error:", e);
+      addToast('মুছে ফেলার সময় ত্রুটি হয়েছে।', 'error');
     }
-    addToast('পোস্টটি সফলভাবে মুছে ফেলা হয়েছে।', 'success');
     setDeleteModalItem(null);
   };
 
@@ -63,7 +82,7 @@ export const Dashboard = () => {
           
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <Link to="/profile" className="btn btn-secondary btn-sm style-mobile-btn">প্রোফাইল সম্পাদন</Link>
-            {userProfile?.roles?.length > 0 && (
+            {hasAdminRole && (
               <Link to="/admin" className="btn btn-primary btn-sm style-mobile-btn">এডমিন প্যানেলে প্রবেশ</Link>
             )}
           </div>
@@ -137,21 +156,6 @@ export const Dashboard = () => {
             ))}
           </div>
         )}
-      </div>
-
-      {/* Dev Demo Role Selector Bar */}
-      <div className="card" style={{ marginBottom: '1.5rem', padding: '0.85rem', backgroundColor: 'var(--bg-elevated)' }}>
-        <div style={{ fontWeight: '700', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <Shield size={16} color="var(--color-primary-600)" /> ডেমো টেস্ট মোড (এডমিন রোল পরিবর্তন করুন):
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-          <button onClick={() => { switchDemoRole(['super_admin']); addToast('সুপার এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">সুপার এডমিন</button>
-          <button onClick={() => { switchDemoRole(['game_admin']); addToast('ক্রীড়া এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">ক্রীড়া এডমিন</button>
-          <button onClick={() => { switchDemoRole(['education_admin']); addToast('শিক্ষা এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">শিক্ষা এডমিন</button>
-          <button onClick={() => { switchDemoRole(['mosque_admin']); addToast('মসজিদ এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">মসজিদ এডমিন</button>
-          <button onClick={() => { switchDemoRole(['organization_admin']); addToast('যুব সংঘ এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">যুব সংঘ এডমিন</button>
-          <button onClick={() => { switchDemoRole(['emergency_admin']); addToast('জরুরি সভা এডমিন রোল সক্রিয়!', 'info'); }} className="btn btn-secondary btn-sm">জরুরি এডমিন</button>
-        </div>
       </div>
 
       {/* Grid Content: My Machines & My Leases */}

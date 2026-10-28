@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { LogIn, Mail, Lock, AlertCircle, ShieldCheck, UserCheck } from 'lucide-react';
+import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +10,7 @@ export const Login = () => {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { login, demoLogin } = useAuth();
+  const { login } = useAuth();
   const { addToast } = useNotification();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,17 +52,6 @@ export const Login = () => {
       addToast('লগইন ব্যর্থ হয়েছে।', 'error');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleQuickLogin = (roleType) => {
-    try {
-      demoLogin(roleType);
-      addToast(roleType === 'admin' ? 'সুপার এডমিন হিসেবে লগইন সফল!' : 'নাগরিক হিসেবে লগইন সফল!', 'success');
-      navigate(from, { replace: true });
-    } catch (err) {
-      console.error(err);
-      addToast('লগইনে সমস্যা হয়েছে।', 'error');
     }
   };
 
@@ -143,31 +132,6 @@ export const Login = () => {
               {submitting ? 'লগইন হচ্ছে...' : 'লগইন করুন'}
             </button>
           </form>
-
-          {/* Quick Demo Login Helpers */}
-          <div style={{ marginTop: '1.25rem', padding: '0.85rem', background: 'var(--bg-elevated, #f8faf9)', borderRadius: '10px', border: '1px solid var(--border-color, #e5e7eb)' }}>
-            <div style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem', textAlign: 'center' }}>
-              পরীক্ষা ও ডেমোর জন্য দ্রুত লগইন করুন:
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin')}
-                className="btn btn-outline"
-                style={{ fontSize: '0.8rem', padding: '0.45rem 0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', borderColor: 'var(--color-primary-600)', color: 'var(--color-primary-700)' }}
-              >
-                <ShieldCheck size={14} /> সুপার এডমিন
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('citizen')}
-                className="btn btn-outline"
-                style={{ fontSize: '0.8rem', padding: '0.45rem 0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
-              >
-                <UserCheck size={14} /> সাধারণ নাগরিক
-              </button>
-            </div>
-          </div>
 
           <div style={{ marginTop: '1.25rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
             অ্যাকাউন্ট নেই? <Link to="/register" style={{ color: 'var(--color-primary-600)', fontWeight: '700' }}>নতুন রেজিস্ট্রেশন করুন</Link>

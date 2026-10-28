@@ -1141,16 +1141,16 @@ p, li, span, div {
    ===================================================== */
 
 .auth-page-wrapper {
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 60px);
   display: flex;
   align-items: flex-start;
-  padding: clamp(1.5rem, 5vw, 4rem) clamp(0.85rem, 4vw, 1.5rem);
   justify-content: center;
+  padding: clamp(2rem, 6vw, 4rem) clamp(0.85rem, 4vw, 1.5rem);
 }
 
 .auth-card {
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
 }
 
 
@@ -1789,7 +1789,7 @@ p, li, span, div {
   flex-direction: column;
   justify-content: space-between;
   position: sticky;
-  top: 68px;
+  top: 60px;
   height: calc(100vh - 68px);
   overflow-y: auto;
   scrollbar-width: thin;
@@ -3101,76 +3101,108 @@ p, li, span, div {
 /* === TOP HEADER (IMPORTED DESIGN MATCH) === */
 .header {
   background-color: var(--primary-dark);
-  padding: 12px 25px;
+  /* fixed height so sidebar sticky top aligns */
+  height: 60px;
+  min-height: 60px;
+  max-height: 60px;
+  padding: 0 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   color: #ffffff;
   flex-shrink: 0;
-  z-index: 50;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 .header-mobile-toggle {
   display: none;
-  background: none;
-  border: none;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
   color: #ffffff;
   cursor: pointer;
-  padding: 4px;
-  margin-right: 8px;
+  padding: 6px;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.header-mobile-toggle:hover {
+  background: rgba(255,255,255,0.22);
 }
 
 .search-bar {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 7px 15px;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  border-radius: 22px;
+  padding: 0 14px;
+  height: 38px;
   display: flex;
   align-items: center;
-  width: 40%;
-  max-width: 440px;
+  /* grows to fill space between hamburger and actions */
+  flex: 1;
+  max-width: 480px;
   cursor: pointer;
   gap: 8px;
+  transition: border-color 0.2s, background 0.2s;
+  min-width: 0;
+}
+.search-bar:hover,
+.search-bar:focus-within {
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.18);
 }
 
 .search-bar .search-icon {
-  color: var(--text-gray);
+  color: rgba(255,255,255,0.7);
   flex-shrink: 0;
 }
 
 .search-bar input {
   border: none;
   outline: none;
-  padding-left: 4px;
   width: 100%;
   font-family: var(--font-main);
   font-size: 13.5px;
-  color: #333333;
+  color: #ffffff;
   background: transparent;
   cursor: pointer;
 }
+.search-bar input::placeholder {
+  color: rgba(255,255,255,0.55);
+}
 
 .header-search-badge {
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 5px;
   padding: 1px 6px;
-  font-size: 11px;
-  color: #64748b;
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.75);
   font-weight: 600;
   font-family: inherit;
   margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .header-actions .icon-btn {
-  background: none;
-  border: none;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
   color: #ffffff;
   font-size: 18px;
   cursor: pointer;
@@ -3178,39 +3210,46 @@ p, li, span, div {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
+  flex-shrink: 0;
   transition: background 0.2s;
 }
 
 .header-actions .icon-btn:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.22);
 }
 
 .header-actions .badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: -3px;
+  right: -3px;
   background: #e74c3c;
   color: white;
-  font-size: 10px;
-  border-radius: 50%;
+  font-size: 9px;
+  border-radius: 10px;
   padding: 2px 5px;
   font-weight: bold;
   line-height: 1;
   border: 1.5px solid var(--primary-dark);
+  min-width: 16px;
+  text-align: center;
 }
 
 .lang-toggle {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13.5px;
-  cursor: pointer;
-  color: #ffffff;
+  gap: 5px;
+  font-size: 12.5px;
+  cursor: default;
+  color: rgba(255,255,255,0.85);
   font-weight: 500;
   user-select: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  white-space: nowrap;
 }
 
 .user-profile-container {
@@ -3220,34 +3259,49 @@ p, li, span, div {
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 10px;
-  border-left: 1px solid rgba(255,255,255,0.3);
-  padding-left: 16px;
+  gap: 8px;
+  border-left: 1px solid rgba(255,255,255,0.2);
+  padding-left: 12px;
   cursor: pointer;
   user-select: none;
+  border-radius: 0 8px 8px 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 6px;
+  transition: background 0.2s;
+}
+
+.user-profile:hover {
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
 }
 
 .user-profile img {
-  width: 35px;
-  height: 35px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: #cccccc;
   object-fit: cover;
-  border: 1.5px solid #ffffff;
+  border: 2px solid rgba(255,255,255,0.5);
+  flex-shrink: 0;
 }
 
 .user-info {
-  font-size: 13.5px;
+  font-size: 12.5px;
   color: #ffffff;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.25;
+  max-width: 130px;
+  overflow: hidden;
 }
 
 .user-info span {
   display: block;
-  font-size: 11px;
-  opacity: 0.85;
+  font-size: 10.5px;
+  opacity: 0.75;
   font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* User & Notif Popovers */
@@ -3284,15 +3338,20 @@ p, li, span, div {
 .notif-popover-list { display: flex; flex-direction: column; gap: 4px; }
 .notif-popover-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 7px 8px;
   border-radius: 8px;
   text-decoration: none;
   color: var(--text-dark);
   transition: background 0.15s;
+  font-family: var(--font-main, inherit);
 }
 .notif-popover-item:hover { background: var(--bg-light); }
+.notif-popover-text {
+  flex: 1;
+  min-width: 0;
+}
 .notif-popover-icon {
   width: 28px;
   height: 28px;
@@ -4027,7 +4086,8 @@ p, li, span, div {
 
 @media (max-width: 768px) {
   .search-bar {
-    width: 60%;
+    flex: 1;
+    max-width: none;
   }
   .header-actions .lang-toggle {
     display: none;
@@ -4042,6 +4102,19 @@ p, li, span, div {
     flex-direction: column;
     gap: 8px;
     text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .lang-toggle {
+    display: none !important;
+  }
+  .user-info {
+    display: none !important;
+  }
+  .header {
+    padding: 0 12px;
+    gap: 8px;
   }
 }
 

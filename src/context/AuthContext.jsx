@@ -223,16 +223,15 @@ export const AuthProvider = ({ children }) => {
     }
 
     localStorage.setItem(`alamdipara_profile_${res.user.uid}`, JSON.stringify(newUserData));
+    try {
+      localStorage.setItem('alamdipara_registered_email', cleanEmail);
+    } catch (_) {}
     setUserProfile(newUserData);
     setCurrentUser(res.user);
 
-    // Send verification email link
+    // Send verification email link directly without restrictive continue URL
     try {
-      const actionCodeSettings = {
-        url: window.location.origin + '/dashboard',
-        handleCodeInApp: false
-      };
-      await sendEmailVerification(res.user, actionCodeSettings);
+      await sendEmailVerification(res.user);
     } catch (vErr) {
       console.warn("sendEmailVerification notice:", vErr.message);
     }
@@ -243,23 +242,24 @@ export const AuthProvider = ({ children }) => {
   // 3. Resend Verification Email Link
   const sendVerificationEmail = async () => {
     if (!auth.currentUser) {
-      throw new Error('কোনো অ্যাকাউন্ট লগইন করা নেই।');
+      throw new Error('কোনো অ্যাকাউন্ট লগইন করা নেই। অনুগ্রহ করে পুনরায় লগইন করুন।');
     }
-    const actionCodeSettings = {
-      url: window.location.origin + '/dashboard',
-      handleCodeInApp: false
-    };
-    await sendEmailVerification(auth.currentUser, actionCodeSettings);
+    await sendEmailVerification(auth.currentUser);
   };
 
   // 4. Refresh Verification Status
   const refreshVerificationStatus = async () => {
     if (!auth.currentUser) return false;
-    await auth.currentUser.reload();
-    const refreshed = auth.currentUser;
-    // Trigger React state refresh with a cloned user object
-    setCurrentUser(Object.assign(Object.create(Object.getPrototypeOf(refreshed)), refreshed));
-    return Boolean(refreshed.emailVerified);
+    try {
+      await auth.currentUser.reload();
+      const refreshed = auth.currentUser;
+      // Trigger React state refresh with a cloned user object
+      setCurrentUser(Object.assign(Object.create(Object.getPrototypeOf(refreshed)), refreshed));
+      return Boolean(refreshed.emailVerified);
+    } catch (err) {
+      console.warn("refreshVerificationStatus notice:", err.message);
+      return false;
+    }
   };
 
   // Login User

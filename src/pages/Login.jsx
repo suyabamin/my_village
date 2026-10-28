@@ -44,7 +44,15 @@ export const Login = () => {
     setSubmitting(true);
 
     try {
-      await login(email.trim(), password);
+      const user = await login(email.trim(), password);
+      if (user && !user.emailVerified) {
+        try {
+          localStorage.setItem('alamdipara_registered_email', user.email);
+        } catch (_) {}
+        addToast('লগইন সফল, তবে ইমেইল ভেরিফিকেশন করা আবশ্যক।', 'info');
+        navigate('/verify-email', { replace: true, state: { from: location.state?.from } });
+        return;
+      }
       addToast('সফলভাবে লগইন হয়েছে!', 'success');
       navigate(from, { replace: true });
     } catch (err) {

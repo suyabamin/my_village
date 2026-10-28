@@ -63,6 +63,9 @@ export const Register = () => {
     setSubmitting(true);
 
     try {
+      try {
+        localStorage.setItem('alamdipara_registered_email', cleanEmail);
+      } catch (_) {}
       await register(cleanEmail, password, cleanName, cleanPhone);
       addToast('রেজিস্ট্রেশন সফল! আপনার ইমেইল যাচাই করার জন্য লিঙ্ক পাঠানো হয়েছে।', 'success');
       navigate('/verify-email');

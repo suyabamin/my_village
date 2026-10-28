@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { Mail, RefreshCw, Send, LogOut, CheckCircle2, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { Mail, RefreshCw, Send, LogOut, CheckCircle2, AlertTriangle, ArrowLeft, ExternalLink, Inbox } from 'lucide-react';
 
 export const VerifyEmail = () => {
   const { 
@@ -21,8 +21,10 @@ export const VerifyEmail = () => {
   const [cooldown, setCooldown] = useState(0);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackType, setFeedbackType] = useState('info'); // 'info' | 'success' | 'error'
+  const pollerRef = useRef(null);
 
   const from = location.state?.from?.pathname || '/dashboard';
+  const displayEmail = currentUser?.email || localStorage.getItem('alamdipara_registered_email') || '';
 
   // If user is already verified, redirect immediately
   useEffect(() => {
@@ -30,6 +32,36 @@ export const VerifyEmail = () => {
       navigate(from, { replace: true });
     }
   }, [isEmailVerified, navigate, from]);
+
+  // Background auto-refresh polling (checks every 4 seconds so user is auto-redirected once clicked)
+  useEffect(() => {
+    if (isEmailVerified || !currentUser) return;
+
+    let attempts = 0;
+    const maxAttempts = 45; // Poll for 3 minutes
+
+    pollerRef.current = setInterval(async () => {
+      attempts += 1;
+      if (attempts > maxAttempts) {
+        clearInterval(pollerRef.current);
+        return;
+      }
+      try {
+        const verified = await refreshVerificationStatus();
+        if (verified) {
+          clearInterval(pollerRef.current);
+          addToast('ইমেইল সফলভাবে যাচাই করা হয়েছে! স্বাগতম।', 'success');
+          navigate(from, { replace: true });
+        }
+      } catch (e) {
+        // Silent catch for background polling
+      }
+    }, 4000);
+
+    return () => {
+      if (pollerRef.current) clearInterval(pollerRef.current);
+    };
+  }, [currentUser, isEmailVerified, refreshVerificationStatus, navigate, from, addToast]);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -40,7 +72,7 @@ export const VerifyEmail = () => {
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  // Handle Refresh Verification Status
+  // Handle Refresh Verification Status manually
   const handleRefresh = async () => {
     setRefreshing(true);
     setFeedbackMessage('');
@@ -51,7 +83,7 @@ export const VerifyEmail = () => {
         navigate(from, { replace: true });
       } else {
         setFeedbackType('info');
-        setFeedbackMessage('আপনার ইমেইল এখনো যাচাই করা হয়নি। অনুগ্রহ করে আপনার ইনবক্স অথবা স্প্যাম ফোল্ডারে পাঠানো লিঙ্কে ক্লিক করুন এবং পুনরায় এখানে রিফ্রেশ করুন।');
+        setFeedbackMessage('আপনার ইমেইল এখনো যাচাই করা হয়নি। অনুগ্রহ করে ইনবক্স অথবা স্প্যাম ফোল্ডারের লিঙ্কে ক্লিক করার পর পুনরায় রিফ্রেশ করুন।');
         addToast('ইমেইল এখনো যাচাই সম্পন্ন হয়নি।', 'info');
       }
     } catch (err) {
@@ -74,17 +106,17 @@ export const VerifyEmail = () => {
       await sendVerificationEmail();
       setCooldown(60);
       setFeedbackType('success');
-      setFeedbackMessage('একটি নতুন ভেরিফিকেশন লিঙ্ক আপনার ইমেইলে সফলভাবে পাঠানো হয়েছে। ইনবক্স ও স্প্যাম ফোল্ডার পরীক্ষা করুন।');
+      setFeedbackMessage('একটি নতুন ভেরিফিকেশন লিঙ্ক আপনার ইমেইলে পাঠানো হয়েছে। অনুগ্রহ করে ইনবক্স ও স্প্যাম ফোল্ডার পরীক্ষা করুন।');
       addToast('ভেরিফিকেশন লিঙ্ক পুনরায় পাঠানো হয়েছে!', 'success');
     } catch (err) {
       console.error(err);
       setFeedbackType('error');
       if (err.code === 'auth/too-many-requests') {
         setCooldown(120);
-        setFeedbackMessage('অতিরিক্ত অনুরোধের কারণে সাময়িক বিরতি প্রয়োজন। অনুগ্রহ করে ২ মিনিট পর পুনরায় চেষ্টা করুন।');
-        addToast('সাময়িক বিরতি প্রয়োজন। অনুগ্রহ করে কিছুক্ষণ পর চেষ্টা করুন।', 'error');
+        setFeedbackMessage('ফায়ারবেস সাময়িক রেট লিমিট প্রয়োগ করেছে। অনুগ্রহ করে ২ মিনিট পর পুনরায় চেষ্টা করুন অথবা ইতিমধ্যে পাঠানো লিঙ্কের জন্য স্প্যাম ফোল্ডার দেখুন।');
+        addToast('কিছুক্ষণ পর আবার চেষ্টা করুন।', 'error');
       } else {
-        setFeedbackMessage(err.message || 'ভেরিফিকেশন ইমেইল পাঠাতে সমস্যা হয়েছে। পুনরায় চেষ্টা করুন।');
+        setFeedbackMessage(err.message || 'ভেরিফিকেশন লিঙ্ক পাঠাতে সমস্যা হয়েছে। পুনরায় চেষ্টা করুন।');
         addToast('ইমেইল পাঠানো ব্যর্থ হয়েছে।', 'error');
       }
     } finally {
@@ -93,14 +125,15 @@ export const VerifyEmail = () => {
   };
 
   const handleLogout = async () => {
+    if (pollerRef.current) clearInterval(pollerRef.current);
     await logout();
     navigate('/login');
   };
 
   return (
     <div className="auth-page-wrapper">
-      <div className="auth-card">
-        <div className="card animate-fade-in" style={{ padding: 'clamp(1.75rem, 5vw, 2.5rem)', textAlign: 'center' }}>
+      <div className="auth-card" style={{ maxWidth: '520px' }}>
+        <div className="card animate-fade-in" style={{ padding: 'clamp(1.5rem, 5vw, 2.5rem)', textAlign: 'center' }}>
           
           {/* Top Mail Icon Badge */}
           <div style={{
@@ -112,35 +145,79 @@ export const VerifyEmail = () => {
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '1.25rem'
+            marginBottom: '1rem'
           }}>
             <Mail size={32} strokeWidth={2.2} />
           </div>
 
-          <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.75rem)', fontWeight: '800', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
-            ইমেইল ভেরিফিকেশন প্রয়োজন
+          <h1 style={{ fontSize: 'clamp(1.35rem, 4vw, 1.65rem)', fontWeight: '800', marginBottom: '0.4rem', color: 'var(--text-main)' }}>
+            ইমেইল ভেরিফিকেশন লিঙ্ক পাঠানো হয়েছে
           </h1>
 
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.93rem', lineHeight: 1.5, marginBottom: '1.25rem' }}>
-            নিরাপত্তার স্বার্থে সুরক্ষিত ফিচারগুলো ব্যবহারের পূর্বে আপনার ইমেইল ঠিকানা যাচাই করা আবশ্যক।
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.5, marginBottom: '1.25rem' }}>
+            নিরাপত্তার স্বার্থে আপনার অ্যাকাউন্টের ইমেইল ঠিকানাটি নিশ্চিত করা প্রয়োজন।
           </p>
 
           {/* User Email Box */}
-          {currentUser?.email && (
+          {displayEmail && (
             <div style={{
-              padding: '0.75rem 1rem',
-              backgroundColor: 'var(--bg-elevated, #f8faf9)',
+              padding: '0.8rem 1rem',
+              backgroundColor: 'var(--bg-elevated, #f0fdf4)',
               borderRadius: '10px',
-              border: '1px solid var(--border-color, #e2e8f0)',
-              fontSize: '0.95rem',
+              border: '1px solid #bbf7d0',
+              fontSize: '0.96rem',
               fontWeight: '700',
-              color: 'var(--color-primary-800, #166534)',
+              color: '#166534',
               wordBreak: 'break-all',
-              marginBottom: '1.5rem'
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
             }}>
-              📧 {currentUser.email}
+              <Mail size={16} /> {displayEmail}
             </div>
           )}
+
+          {/* Direct 1-Click Mail Open Buttons */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '0.65rem',
+            marginBottom: '1.25rem'
+          }}>
+            <a
+              href="https://mail.google.com/mail/u/0/#search/alamdipara"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary"
+              style={{
+                fontSize: '0.85rem',
+                padding: '0.65rem 0.5rem',
+                justifyContent: 'center',
+                textDecoration: 'none'
+              }}
+            >
+              <Inbox size={15} /> জিমেইলে খুঁজুন <ExternalLink size={12} />
+            </a>
+
+            <a
+              href="https://mail.google.com/mail/u/0/#spam"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary"
+              style={{
+                fontSize: '0.85rem',
+                padding: '0.65rem 0.5rem',
+                justifyContent: 'center',
+                textDecoration: 'none',
+                color: '#b45309',
+                borderColor: '#fde68a'
+              }}
+            >
+              <AlertTriangle size={15} /> স্প্যাম ফোল্ডার <ExternalLink size={12} />
+            </a>
+          </div>
 
           {/* Feedback Alert */}
           {feedbackMessage && (
@@ -150,7 +227,7 @@ export const VerifyEmail = () => {
               fontSize: '0.88rem',
               lineHeight: 1.5,
               textAlign: 'left',
-              marginBottom: '1.5rem',
+              marginBottom: '1.25rem',
               display: 'flex',
               alignItems: 'flex-start',
               gap: '0.65rem',
@@ -169,26 +246,35 @@ export const VerifyEmail = () => {
             </div>
           )}
 
-          {/* Instructions Box */}
+          {/* Detailed Instructions Box to Find Verification Link */}
           <div style={{
             textAlign: 'left',
             padding: '1rem',
             borderRadius: '10px',
-            backgroundColor: 'var(--bg-elevated, #f8faf9)',
-            border: '1px solid var(--border-color, #e5e7eb)',
-            fontSize: '0.86rem',
-            color: 'var(--text-main)',
+            backgroundColor: '#fffbeb',
+            border: '1px solid #fef3c7',
+            fontSize: '0.84rem',
+            color: '#92400e',
             lineHeight: 1.6,
             marginBottom: '1.5rem'
           }}>
-            <div style={{ fontWeight: '700', marginBottom: '0.35rem', color: 'var(--color-primary-700)' }}>
-              কীভাবে ভেরিফিকেশন সম্পন্ন করবেন?
+            <div style={{ fontWeight: '700', marginBottom: '0.35rem', color: '#78350f', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <AlertTriangle size={15} /> লিঙ্কটি খুঁজে পেতে করণীয়:
             </div>
-            <ol style={{ paddingLeft: '1.25rem', margin: 0 }}>
-              <li>আপনার ইমেইল ইনবক্স চেক করে ভেরিফিকেশন লিঙ্কটিতে ক্লিক করুন।</li>
-              <li>ইনবক্সে না পেলে অনুগ্রহ করে <strong>স্প্যাম (Spam) বা জাঙ্ক (Junk)</strong> ফোল্ডার পরীক্ষা করুন।</li>
-              <li>লিঙ্কে ক্লিক করার পর নিচের <strong>"ভেরিফিকেশন স্ট্যাটাস রিফ্রেশ করুন"</strong> বাটনে চাপ দিন।</li>
-            </ol>
+            <ul style={{ paddingLeft: '1.15rem', margin: 0 }}>
+              <li>
+                <strong>স্প্যাম (Spam) বা প্রমোশন ফোল্ডার:</strong> গুগল স্বয়ংক্রিয়ভাবে প্রথমবার নো-রিপ্লাই ইমেইলগুলো স্প্যামে পাঠিয়ে দিতে পারে। জিমেইল অ্যাপের বাম পাশের মেন্যু থেকে <strong>Spam</strong> ফোল্ডার চেক করুন।
+              </li>
+              <li>
+                <strong>প্রেরকের নাম:</strong> ইমেইলটি এসেছে <code>noreply@alamdipara-digital-village.firebaseapp.com</code> থেকে।
+              </li>
+              <li>
+                <strong>বিষয় (Subject):</strong> <code>Verify your email for alamdipara-digital-village</code>
+              </li>
+              <li>
+                <strong>স্বয়ংক্রিয় যাচাই:</strong> আপনি ইমেইলের লিঙ্কে ক্লিক করার পর পেজটি স্বয়ংক্রিয়ভাবে চালু হয়ে যাবে (বা রিফ্রেশ বাটনে ক্লিক করুন)।
+              </li>
+            </ul>
           </div>
 
           {/* Action Buttons */}
@@ -201,7 +287,7 @@ export const VerifyEmail = () => {
               style={{ width: '100%', justifyContent: 'center' }}
             >
               <RefreshCw size={17} className={refreshing ? 'animate-spin' : ''} />
-              {refreshing ? 'পরীক্ষা করা হচ্ছে...' : 'ভেরিফিকেশন স্ট্যাটাস রিফ্রেশ করুন'}
+              {refreshing ? 'যাচাই পরীক্ষা করা হচ্ছে...' : 'ভেরিফিকেশন স্ট্যাটাস রিফ্রেশ করুন'}
             </button>
 
             <button
@@ -258,7 +344,7 @@ export const VerifyEmail = () => {
                 padding: 0
               }}
             >
-              <LogOut size={14} /> লগআউট
+              <LogOut size={14} /> লগআউট / অন্য অ্যাকাউন্ট
             </button>
           </div>
 

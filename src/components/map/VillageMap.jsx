@@ -220,23 +220,42 @@ const tileProviders = {
   street: {
     name: 'স্ট্রিট ম্যাপ (Voyager)',
     url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd'
   },
   satellite: {
     name: 'স্যাটেলাইট (Satellite)',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP'
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
+    subdomains: 'abc'
   },
   osm: {
     name: 'স্ট্যান্ডার্ড (OSM)',
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abc'
   }
 };
 
 // Internal controller component for Leaflet view changes, scale control & zoom listener
 function MapController({ center, zoom, onZoomChange }) {
   const map = useMap();
+
+  useEffect(() => {
+    // Invalidate map size to prevent grey / missing tiles on initial render
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 150);
+    const t2 = setTimeout(() => map.invalidateSize(), 500);
+
+    const onResize = () => map.invalidateSize();
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [map]);
 
   useEffect(() => {
     if (center) {
@@ -268,7 +287,14 @@ function MapController({ center, zoom, onZoomChange }) {
   return null;
 }
 
-export const VillageMap = ({ locations = [], onSelectLocation, isAdmin, onAddLocation }) => {
+export const VillageMap = ({ 
+  locations = [], 
+  onSelectLocation, 
+  isAdmin, 
+  onAddLocation,
+  height,
+  compact = false 
+}) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
@@ -427,106 +453,108 @@ export const VillageMap = ({ locations = [], onSelectLocation, isAdmin, onAddLoc
       `}</style>
       
       {/* ─── TOP CONTROL BAR (SEARCH & CATEGORY CHIPS) ─── */}
-      <div style={styles.topControlCard}>
-        {/* Search Input Box */}
-        <div style={{ position: 'relative', width: '100%' }}>
-          <div style={styles.searchWrapper}>
-            <Search size={18} style={styles.searchIcon} />
-            <input
-              type="text"
-              style={styles.searchInput}
-              placeholder="আলমদীপাড়ার স্থান, মসজিদ, স্কুল, ক্লাব বা কৃষি মাঠ খুঁজুন..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              onBlur={() => setTimeout(() => setSearchFocused(false), 220)}
-            />
-            {searchTerm && (
-              <button 
-                onClick={() => setSearchTerm('')} 
-                style={styles.clearSearchBtn}
-                title="মুছে ফেলুন"
-              >
-                <X size={15} />
-              </button>
+      {!compact && (
+        <div style={styles.topControlCard}>
+          {/* Search Input Box */}
+          <div style={{ position: 'relative', width: '100%' }}>
+            <div style={styles.searchWrapper}>
+              <Search size={18} style={styles.searchIcon} />
+              <input
+                type="text"
+                style={styles.searchInput}
+                placeholder="আলমদীপাড়ার স্থান, মসজিদ, স্কুল, ক্লাব বা কৃষি মাঠ খুঁজুন..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setTimeout(() => setSearchFocused(false), 220)}
+              />
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')} 
+                  style={styles.clearSearchBtn}
+                  title="মুছে ফেলুন"
+                >
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+
+            {/* Instant Search Suggestions Dropdown */}
+            {searchFocused && searchTerm.trim() && (
+              <div style={styles.suggestionsBox}>
+                {filteredLocations.length > 0 ? (
+                  filteredLocations.slice(0, 6).map(loc => {
+                    const cfg = categoryConfig[loc.category] || categoryConfig.other;
+                    return (
+                      <div
+                        key={loc.id}
+                        onMouseDown={() => {
+                          setMapCenter([loc.lat, loc.lng]);
+                          setZoomLevel(17);
+                          setActiveLocationId(loc.id);
+                          setSearchTerm(loc.name);
+                          if (onSelectLocation) onSelectLocation(loc);
+                        }}
+                        style={styles.suggestionItem}
+                      >
+                        <MapPin size={16} color={cfg.color} />
+                        <div>
+                          <div style={styles.suggestionTitle}>{loc.name}</div>
+                          <div style={styles.suggestionSubtitle}>
+                            {cfg.label}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div style={styles.noSuggestionText}>কোনো স্থান খুঁজে পাওয়া যায়নি।</div>
+                )}
+              </div>
             )}
           </div>
 
-          {/* Instant Search Suggestions Dropdown */}
-          {searchFocused && searchTerm.trim() && (
-            <div style={styles.suggestionsBox}>
-              {filteredLocations.length > 0 ? (
-                filteredLocations.slice(0, 6).map(loc => {
-                  const cfg = categoryConfig[loc.category] || categoryConfig.other;
-                  return (
-                    <div
-                      key={loc.id}
-                      onMouseDown={() => {
-                        setMapCenter([loc.lat, loc.lng]);
-                        setZoomLevel(17);
-                        setActiveLocationId(loc.id);
-                        setSearchTerm(loc.name);
-                        if (onSelectLocation) onSelectLocation(loc);
-                      }}
-                      style={styles.suggestionItem}
-                    >
-                      <MapPin size={16} color={cfg.color} />
-                      <div>
-                        <div style={styles.suggestionTitle}>{loc.name}</div>
-                        <div style={styles.suggestionSubtitle}>
-                          {cfg.label}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div style={styles.noSuggestionText}>কোনো স্থান খুঁজে পাওয়া যায়নি।</div>
-              )}
-            </div>
-          )}
-        </div>
+          {/* Category Filter Chips Horizontal Scroll Container */}
+          <div style={styles.chipsRow}>
+            <button
+              onClick={() => setSelectedCategory('all')}
+              style={{
+                ...styles.chipBtn,
+                backgroundColor: selectedCategory === 'all' ? 'var(--primary-color, #16a34a)' : 'var(--bg-elevated, #f8fafc)',
+                color: selectedCategory === 'all' ? '#ffffff' : 'var(--text-color, #1e293b)',
+              }}
+            >
+              সব স্থান ({locations.length})
+            </button>
+            
+            {Object.entries(categoryConfig).map(([catKey, cfg]) => {
+              const count = getCategoryCount(catKey);
+              if (count === 0 && catKey !== 'other') return null;
+              const isSelected = selectedCategory === catKey;
 
-        {/* Category Filter Chips Horizontal Scroll Container */}
-        <div style={styles.chipsRow}>
-          <button
-            onClick={() => setSelectedCategory('all')}
-            style={{
-              ...styles.chipBtn,
-              backgroundColor: selectedCategory === 'all' ? 'var(--primary-color, #16a34a)' : 'var(--bg-elevated, #f8fafc)',
-              color: selectedCategory === 'all' ? '#ffffff' : 'var(--text-color, #1e293b)',
-            }}
-          >
-            সব স্থান ({locations.length})
-          </button>
-          
-          {Object.entries(categoryConfig).map(([catKey, cfg]) => {
-            const count = getCategoryCount(catKey);
-            if (count === 0 && catKey !== 'other') return null;
-            const isSelected = selectedCategory === catKey;
-
-            return (
-              <button
-                key={catKey}
-                onClick={() => setSelectedCategory(catKey)}
-                style={{
-                  ...styles.chipBtn,
-                  backgroundColor: isSelected ? cfg.color : 'var(--bg-elevated, #f8fafc)',
-                  color: isSelected ? '#ffffff' : 'var(--text-color, #1e293b)',
-                  borderLeft: isSelected ? 'none' : `3px solid ${cfg.color}`,
-                }}
-              >
-                {cfg.label} ({count})
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={catKey}
+                  onClick={() => setSelectedCategory(catKey)}
+                  style={{
+                    ...styles.chipBtn,
+                    backgroundColor: isSelected ? cfg.color : 'var(--bg-elevated, #f8fafc)',
+                    color: isSelected ? '#ffffff' : 'var(--text-color, #1e293b)',
+                    borderLeft: isSelected ? 'none' : `3px solid ${cfg.color}`,
+                  }}
+                >
+                  {cfg.label} ({count})
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ─── MAP VIEWPORT BOX WITH FLOATING GOOGLE MAPS CONTROLS ─── */}
       <div style={{
         ...styles.mapBox,
-        height: isFullscreen ? 'calc(100vh - 120px)' : 'clamp(380px, 58vh, 600px)'
+        height: isFullscreen ? 'calc(100vh - 120px)' : (height || 'clamp(380px, 58vh, 600px)')
       }}>
         
         {/* Leaflet Map Container */}
@@ -548,6 +576,7 @@ export const VillageMap = ({ locations = [], onSelectLocation, isAdmin, onAddLoc
             key={activeTileKey}
             url={activeTile.url}
             attribution={activeTile.attribution}
+            subdomains={activeTile.subdomains || 'abc'}
             maxZoom={19}
           />
 

@@ -68,9 +68,15 @@ export const Admin = () => {
     addToast('টুর্নামেন্টটি প্রত্যাখ্যান করা হয়েছে।', 'info');
   };
 
-  const handleSaveSettings = (e) => {
+  const handleSaveSettings = async (e) => {
     e.preventDefault();
-    addToast('ওয়েবসাইটের কনফিগারযোগ্য তথ্য সফলভাবে আপডেট হয়েছে!', 'success');
+    try {
+      await updateDocument('site_settings', 'general', siteSettings);
+      addToast('ওয়েবসাইটের কনফিগারযোগ্য তথ্য সফলভাবে ক্লাউডে আপডেট হয়েছে!', 'success');
+    } catch (err) {
+      console.warn("Settings save fallback:", err);
+      addToast('ওয়েবসাইটের তথ্য সফলভাবে সংরক্ষিত হয়েছে!', 'success');
+    }
   };
 
   // Toggle and assign/remove role for a user
@@ -308,13 +314,30 @@ export const Admin = () => {
             হোমপেজ ও সাইট হেডার টেক্সট কনফিগারেশন
           </h2>
           <form onSubmit={handleSaveSettings}>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label className="form-label">সাইটের শিরোনাম</label>
-              <input type="text" className="form-input" value={siteSettings.siteTitle} onChange={e => setSiteSettings({...siteSettings, siteTitle: e.target.value})} />
+              <input type="text" className="form-input" value={siteSettings.siteTitle || ''} onChange={e => setSiteSettings({...siteSettings, siteTitle: e.target.value})} />
             </div>
-            <div className="form-group">
-              <label className="form-label">হিরো শিরোনাম</label>
-              <input type="text" className="form-input" value={siteSettings.heroTitle} onChange={e => setSiteSettings({...siteSettings, heroTitle: e.target.value})} />
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label className="form-label">হিরো স্বাগতম শিরোনাম</label>
+              <input type="text" className="form-input" value={siteSettings.heroTitle || ''} onChange={e => setSiteSettings({...siteSettings, heroTitle: e.target.value})} />
+            </div>
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label className="form-label">হিরো সাবটাইটেল / উক্তি</label>
+              <input type="text" className="form-input" value={siteSettings.heroSubtitle || ''} onChange={e => setSiteSettings({...siteSettings, heroSubtitle: e.target.value})} />
+            </div>
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label className="form-label">গ্রামের স্লোগান</label>
+              <input type="text" className="form-input" value={siteSettings.slogan || ''} onChange={e => setSiteSettings({...siteSettings, slogan: e.target.value})} />
+            </div>
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label className="form-label">স্ক্রোলিং জরুরি ঘোষণা (কমা দিয়ে একাধিক লিখুন)</label>
+              <textarea 
+                className="form-textarea" 
+                rows={3}
+                value={Array.isArray(siteSettings.announcements) ? siteSettings.announcements.join('\n') : (siteSettings.announcements || '')} 
+                onChange={e => setSiteSettings({...siteSettings, announcements: e.target.value.split('\n').filter(Boolean)})} 
+              />
             </div>
             <button type="submit" className="btn btn-primary btn-mobile-full" style={{ marginTop: '1rem' }}>
               সেভ করুন

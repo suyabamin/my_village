@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আলমদীপাড়া ডিজিটাল গ্রাম</title>
+    <!-- Google Fonts for Bengali -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === GLOBAL VARIABLES & RESET === */
+        :root {
+            --primary-dark: #0f4d2b;
+            --primary-green: #1b7a43;
+            --bg-light: #f4f7f6;
+            --text-dark: #333;
+            --text-gray: #666;
+            --text-light: #999;
+            --white: #ffffff;
+            --border-color: #e0e0e0;
+            
+            --card-orange: #fff3e0;
+            --card-blue: #e3f2fd;
+            --card-purple: #f3e5f5;
+            --card-pink: #fce4ec;
+            --card-teal: #e0f2f1;
+            --card-red: #ffebee;
+            --card-yellow: #fff8e1;
+
+            --font-main: 'Hind Siliguri', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* === SIDEBAR === */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-y: auto;
+            background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+            background-position: bottom center;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(15,77,43,0.95) 0%, rgba(15,77,43,0.8) 50%, rgba(15,77,43,0.4) 100%);
+            z-index: 1;
+        }
+
+        .sidebar-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            padding: 2px;
+        }
+        .sidebar-logo h1 {
+            font-size: 18px;
+            line-height: 1.2;
+        }
+        .sidebar-logo span {
+            font-size: 11px;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            padding: 15px 10px;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .sidebar-menu a i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-menu a.active, .sidebar-menu a:hover {
+            background-color: var(--primary-green);
+        }
+
+        .sidebar-bottom-text {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+        .sidebar-bottom-text strong {
+            display: block;
+            font-size: 16px;
+        }
+
+        /* === MAIN LAYOUT === */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* === TOP HEADER === */
+        .header {
+            background-color: var(--primary-dark);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--white);
+        }
+
+        .search-bar {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            width: 40%;
+        }
+        .search-bar i { color: var(--text-gray); }
+        .search-bar input {
+            border: none;
+            outline: none;
+            padding-left: 10px;
+            width: 100%;
+            font-family: var(--font-main);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-actions .icon-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+        }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            font-size: 10px;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-weight: bold;
+        }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 1px solid rgba(255,255,255,0.3);
+            padding-left: 20px;
+        }
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+        .user-info { font-size: 14px; }
+        .user-info span { display: block; font-size: 12px; opacity: 0.8; }
+
+        /* === DASHBOARD CONTENT (GRID) === */
+        .dashboard-content {
+            padding: 20px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 2.2fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 70px);
+        }
+
+        /* === LEFT COLUMN === */
+        .left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            height: 220px;
+            border-radius: 12px;
+            background-image: url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 25px;
+            color: var(--white);
+            overflow: hidden;
+        }
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(15,77,43,0.9) 0%, rgba(15,77,43,0.4) 100%);
+        }
+        .hero-text {
+            position: relative;
+            z-index: 1;
+        }
+        .hero-text h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .hero-text p {
+            font-size: 16px;
+            font-style: italic;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .hero-bottom-info {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+        }
+        .hero-bottom-info div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 10px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .hero-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1;
+        }
+        .hero-nav.prev { left: 10px; }
+        .hero-nav.next { right: 10px; }
+
+        /* Services Section */
+        .services-section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .section-header h3 {
+            font-size: 18px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-header a {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .service-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: 0.2s;
+        }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        .service-header {
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .service-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .service-header h4 { font-size: 14px; margin-bottom: 2px;}
+        .service-header p { font-size: 10px; color: var(--text-gray);}
+
+        .service-img {
+            height: 100px;
+            position: relative;
+        }
+        .service-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .service-arrow {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--text-dark);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Specific Card Colors */
+        .card-farming .service-header { background-color: #e8f5e9; }
+        .card-farming .service-icon { background-color: #4caf50; color: white; }
+        .card-sports .service-header { background-color: #fff3e0; }
+        .card-sports .service-icon { background-color: #ff9800; color: white; }
+        .card-education .service-header { background-color: #e3f2fd; }
+        .card-education .service-icon { background-color: #2196f3; color: white; }
+        .card-mosque .service-header { background-color: #e0f2f1; }
+        .card-mosque .service-icon { background-color: #009688; color: white; }
+        .card-youth .service-header { background-color: #f3e5f5; }
+        .card-youth .service-icon { background-color: #9c27b0; color: white; }
+        
+        .card-culture .service-header { background-color: #fce4ec; }
+        .card-culture .service-icon { background-color: #e91e63; color: white; }
+        .card-social .service-header { background-color: #e0f7fa; }
+        .card-social .service-icon { background-color: #00bcd4; color: white; }
+        .card-emergency .service-header { background-color: #ffebee; }
+        .card-emergency .service-icon { background-color: #f44336; color: white; }
+        .card-religion .service-header { background-color: #fff8e1; }
+        .card-religion .service-icon { background-color: #ffc107; color: white; }
+
+        /* Map Section */
+        .map-section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .map-header-left h3 { font-size: 18px; color: var(--primary-dark); display: flex; align-items: center; gap: 8px;}
+        .map-header-left p { font-size: 12px; color: var(--text-gray); margin-top: 2px;}
+        
+        .map-filters {
+            display: flex;
+            gap: 10px;
+        }
+        .map-filters span {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .map-filters span::before {
+            content: '';
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .filter-all::before { background: var(--primary-green); }
+        .filter-mosque::before { background: #00bcd4; }
+        .filter-edu::before { background: #2196f3; }
+        .filter-farm::before { background: #4caf50; }
+        .filter-sports::before { background: #ff9800; }
+        .filter-social::before { background: #9c27b0; }
+
+        .map-container {
+            height: 300px;
+            border-radius: 10px;
+            background-image: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Faking the map UI elements */
+        .map-ui-left {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .map-btn {
+            width: 30px; height: 30px;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            color: var(--text-dark);
+        }
+        .map-ui-bottom {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .map-btn-large {
+            background: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-family: var(--font-main);
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .map-ui-bottom-right {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+        }
+        
+        /* Fake Map Labels */
+        .map-label {
+            position: absolute;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .map-label i { color: #4caf50; }
+
+        /* === RIGHT COLUMN === */
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Widgets */
+        .widget {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .widget-header h3 {
+            font-size: 16px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .widget-header a {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        /* Notice Widget */
+        .notice-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .notice-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .notice-icon {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .notice-icon.red { background: #ffebee; color: #f44336; }
+        .notice-icon.teal { background: #e0f2f1; color: #009688; }
+        .notice-icon.pink { background: #fce4ec; color: #e91e63; }
+        .notice-icon.purple { background: #f3e5f5; color: #9c27b0; }
+        .notice-icon.orange { background: #fff3e0; color: #ff9800; }
+        
+        .notice-content h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .notice-content p {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        /* Events Widget */
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .event-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .event-img {
+            width: 50px; height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .event-info h4 {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .event-info p {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        /* Weather Widget */
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .weather-temp {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .weather-temp i {
+            font-size: 35px;
+            color: #ffb300;
+        }
+        .weather-temp h2 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .weather-temp p {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+        .weather-details {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+        .weather-details div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        .weather-details strong {
+            color: var(--text-dark);
+        }
+
+        .forecast-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .forecast-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .forecast-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+        .forecast-day span:first-child { font-weight: 600; }
+        .forecast-day i { color: #ffb300; font-size: 16px; }
+        
+        .agri-advice {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .agri-advice i {
+            color: #4caf50;
+            font-size: 20px;
+        }
+        .agri-advice p {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .agri-advice strong { display: block; margin-bottom: 2px;}
+
+        /* === FOOTER === */
+        .footer {
+            background: var(--white);
+            padding: 10px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-gray);
+            border-top: 1px solid var(--border-color);
+        }
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        .footer-links a:hover { color: var(--primary-green); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px;}
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #999; }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-logo">
+                <img src="https://cdn-icons-png.flaticon.com/512/2913/2913465.png" alt="Logo">
+                <div>
+                    <h1>আলমদীপাড়া ডিজিটাল গ্রাম</h1>
+                    <span>একাটেরে তথ্য, উন্নয়ন, সমৃদ্ধি</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="fas fa-home"></i> হোম</a></li>
+                <li><a href="#"><i class="fas fa-map-marked-alt"></i> ডিজিটাল ম্যাপ</a></li>
+                <li><a href="#"><i class="fas fa-leaf"></i> কৃষি ও আবহাওয়া</a></li>
+                <li><a href="#"><i class="fas fa-trophy"></i> খেলাধুলা</a></li>
+                <li><a href="#"><i class="fas fa-book-open"></i> শিক্ষা প্রতিষ্ঠান</a></li>
+                <li><a href="#"><i class="fas fa-mosque"></i> মসজিদ</a></li>
+                <li><a href="#"><i class="fas fa-users"></i> যুব ইউনিয়ন সংঘ</a></li>
+                <li><a href="#"><i class="fas fa-music"></i> সাংস্কৃতিক অনুষ্ঠান</a></li>
+                <li><a href="#"><i class="fas fa-hands-helping"></i> সামাজিক অনুষ্ঠান</a></li>
+                <li><a href="#"><i class="fas fa-exclamation-circle"></i> জরুরি মিটিং</a></li>
+                <li><a href="#"><i class="fas fa-star-and-crescent"></i> ধর্মীয় অনুষ্ঠান</a></li>
+            </ul>
+
+            <div class="sidebar-bottom-text">
+                সরজে ঘেরা<br>
+                <strong>আলমদীপাড়া</strong><br>
+                স্মার্ট গ্রামের পথে
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        
+        <!-- HEADER -->
+        <header class="header">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="গ্রাম, স্থান, সেবা বা কিছু খুঁজুন...">
+            </div>
+
+            <div class="header-actions">
+                <button class="icon-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <button class="icon-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="lang-toggle">
+                    <i class="fas fa-globe"></i> বাংলা <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                </div>
+                <div class="user-profile">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                    <div class="user-info">
+                        মাহফুজ ইসলাম
+                        <span>সাধারণ ব্যবহারকারী</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD GRID -->
+        <main class="dashboard-content">
+            
+            <!-- LEFT COLUMN -->
+            <div class="left-col">
+                
+                <!-- Hero Banner -->
+                <div class="hero-banner">
+                    <div class="hero-text">
+                        <h2>আলমদীপাড়া ডিজিটাল গ্রামে<br>আপনাকে স্বাগতম!</h2>
+                        <p><i class="fas fa-quote-left"></i> "গ্রামের উন্নয়ন, প্রগতির ছোঁয়ায়"</p>
+                    </div>
+                    
+                    <button class="hero-nav prev"><i class="fas fa-chevron-left"></i></button>
+                    <button class="hero-nav next"><i class="fas fa-chevron-right"></i></button>
+
+                    <div class="hero-bottom-info">
+                        <div><i class="fas fa-map-marker-alt"></i> আলমদীপাড়া, বাংলাদেশ</div>
+                        <div><i class="fas fa-calendar-alt"></i> আজ: ২৭ এপ্রিল ২০২৫</div>
+                        <div><i class="fas fa-cloud-sun"></i> ২৮°C আংশিক মেঘলা</div>
+                    </div>
+                </div>
+
+                <!-- Services Section -->
+                <div class="services-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-star" style="color: #4caf50;"></i> আমাদের সেবাসমূহ</h3>
+                        <a href="#">সব দেখুন <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <div class="services-grid">
+                        <!-- Farming -->
+                        <div class="service-card card-farming">
+                            <div class="service-header">
+                                <div class="service-icon"><i class="fas fa-leaf"></i></div>
+                                <div>
+                                    <h4>কৃষি</h4>
+                                    <p>মাঠ, খামার, ফসল</p>
+                                </div>
+                            </div>
+                            <div class="service-img">
+                                <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Farming">
+                                <div class="service-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Sports -->
+                        <div class="service-card card-sports">
+                            <div class="service-header">
+                                <div class="service-icon"><i class="fas fa-trophy"></i></div>
+                                <div>
+                                    <h4>খেলাধুলা</h4>
+                                    <p>টুর্নামেন্ট, খেলা</p>
+                                </div>
+                            </div>
+                            <div class="service-img">
+                                <img src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Sports">
+                                <div class="service-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <div class="service-card card-education">
+                            <div class="service-header">
+                                <div class="service-icon"><i class="fas fa-book-open"></i></div>
+                                <div>
+                                    <h4>শিক্ষা প্রতিষ্ঠান</h4>
+                                    <p>বিশ্ববিদ্যালয়, স্কুল</p>
+                                </div>
+                            </div>
+                            <div class="service-img">
+                                <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Education">
+                                <div class="service-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Mosque -->
+                        <div class="service-card card-mosque">
+                            <div class="service-header">
+                                <div class="service-icon"><i class="fas fa-mosque"></i></div>
+                                <div>
+                                    <h4>মসজিদ</h4>
+                                    <p>নামাজের সময়সূচী</p>
+                                </div>
+                            </div>
+                            <div class="service-img">
+                                <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Mosque">
+                                <div class="service-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Youth -->
+                        <div class="service-card card-youth">
+                            <div class="service-header">
+                                <div class="service-icon"><i class="fas fa-users"></i></div>
+                                <div>
+                                    <h4>যুব ইউনিয়ন</h4>
+                                    <p>সদস্য, কার্যক্রম</p>
+                                </div>
+                            </div>
+                            <div class="service-img">
+                                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Youth">
+                                <div class="service-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Culture -->
+                        <div class="service-card card-culture">
+                            <div class="service-header">
+                                <div class="service-icon"><i class="fas fa-music"></i></div>
+                                <div>
+                                    <h4>সাংস্কৃতিক</h4>
+                                    <p>গান, নাচ, নাটক</p>
+                                </div>
+                            </div>
+                            <div class="service-img">
+                                <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Culture">
+                                <div class="service-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Social -->
+                        <div class="service-card card-social">
+                            <div class="service-header">
+                                <div class="service-icon"><i class="fas fa-hands-helping"></i></div>
+                                <div>
+                                    <h4>সামাজিক</h4>
+                                    <p>মিলন, সাহায্য</p>
+                                </div>
+                            </div>
+                            <div class="service-img">
+                                <img src="https://images.unsplash.com/photo-1593113589914-07599018dd2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Social">
+                                <div class="service-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency -->
+                        <div class="service-card card-emergency">
+                            <div class="service-header">
+                                <div class="service-icon"><i class="fas fa-bell"></i></div>
+                                <div>
+                                    <h4>জরুরি মিটিং</h4>
+                                    <p>সতর্কতা, নোটিশ</p>
+                                </div>
+                            </div>
+                            <div class="service-img">
+                                <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Emergency">
+                                <div class="service-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Section -->
+                <div class="map-section">
+                    <div class="map-header">
+                        <div class="map-header-left">
+                            <h3><i class="fas fa-map-marker-alt" style="color: #4caf50;"></i> ডিজিটাল ভিলেজ ম্যাপ</h3>
+                            <p>আলমদীপাড়া প্রামের সকল গুরুত্বপূর্ণ স্থানসমূহ</p>
+                        </div>
+                        <div class="map-filters">
+                            <span class="filter-all" style="background: #e8f5e9; color: #2e7d32;">সব</span>
+                            <span class="filter-mosque">মসজিদ</span>
+                            <span class="filter-edu">শিক্ষা প্রতিষ্ঠান</span>
+                            <span class="filter-farm">কৃষি মাঠ</span>
+                            <span class="filter-sports">খেলাধুলা</span>
+                            <span class="filter-social">সঙ্ঘ/ক্লাব</span>
+                        </div>
+                    </div>
+
+                    <div class="map-container">
+                        <!-- Faking Map UI -->
+                        <div class="map-ui-left">
+                            <button class="map-btn"><i class="fas fa-plus"></i></button>
+                            <button class="map-btn"><i class="fas fa-minus"></i></button>
+                            <button class="map-btn"><i class="fas fa-layer-group"></i></button>
+                        </div>
+
+                        <!-- Faking Map Labels/Pins -->
+                        <div class="map-label" style="top: 30%; left: 25%;">
+                            <i class="fas fa-mosque"></i> বায়তুল নূর জামে মসজিদ
+                        </div>
+                        <div class="map-label" style="top: 20%; right: 20%;">
+                            <i class="fas fa-mosque"></i> বায়তুল মামুর জামে মসজিদ
+                        </div>
+                        <div class="map-label" style="bottom: 25%; left: 20%;">
+                            <i class="fas fa-ambulance"></i> জরুরি সেবা
+                        </div>
+                        <div class="map-label" style="top: 50%; left: 50%;">
+                            <i class="fas fa-school"></i> আলমদীপাড়া উচ্চ বিদ্যালয়
+                        </div>
+
+                        <div class="map-ui-bottom">
+                            <button class="map-btn-large"><i class="fas fa-map"></i> মানচিত্র</button>
+                            <button class="map-btn-large"><i class="fas fa-satellite"></i> স্যাটেলাইট</button>
+                        </div>
+                        <div class="map-ui-bottom-right">
+                            <button class="map-btn-large"><i class="fas fa-location-arrow"></i> আমার অবস্থান</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="right-col">
+                
+                <!-- Notice Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-bullhorn" style="color: #4caf50;"></i> জরুরি নোটিশ</h3>
+                        <a href="#">সব দেখুন <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="notice-list">
+                        <div class="notice-item">
+                            <div class="notice-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="notice-content">
+                                <h4>মাদকবিরোধী সচেতনতা সভা অনুষ্ঠিত হবে</h4>
+                                <p>আজ, ০৯:০০ AM</p>
+                            </div>
+                        </div>
+                        <div class="notice-item">
+                            <div class="notice-icon teal"><i class="fas fa-futbol"></i></div>
+                            <div class="notice-content">
+                                <h4>বিদ্যালয় বার্ষিক ক্রীড়া প্রতিযোগিতা</h4>
+                                <p>২৮ এপ্রিল ২০২৫</p>
+                            </div>
+                        </div>
+                        <div class="notice-item">
+                            <div class="notice-icon pink"><i class="fas fa-users"></i></div>
+                            <div class="notice-content">
+                                <h4>গ্রামে বৃক্ষরোপণ কর্মসূচি</h4>
+                                <p>২৭ এপ্রিল ২০২৫</p>
+                            </div>
+                        </div>
+                        <div class="notice-item">
+                            <div class="notice-icon purple"><i class="fas fa-book-reader"></i></div>
+                            <div class="notice-content">
+                                <h4>বায়তুল নূর জামে মসজিদে ওয়াজ মাহফিল</h4>
+                                <p>২৬ এপ্রিল ২০২৫</p>
+                            </div>
+                        </div>
+                        <div class="notice-item">
+                            <div class="notice-icon orange"><i class="fas fa-tint"></i></div>
+                            <div class="notice-content">
+                                <h4>জরুরি মিটিং: পানি সংকট সমাধান</h4>
+                                <p>২৫ এপ্রিল ২০২৫</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-calendar-alt" style="color: #4caf50;"></i> আসন্ন অনুষ্ঠান</h3>
+                        <a href="#">সব দেখুন <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="event-list">
+                        <div class="event-item">
+                            <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="event-img" alt="Event">
+                            <div class="event-info">
+                                <h4>বার্ষিক ক্রীড়া প্রতিযোগিতা</h4>
+                                <p>২৮ এপ্রিল ২০২৫, সকাল ১০:০০</p>
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="event-img" alt="Event">
+                            <div class="event-info">
+                                <h4>ওয়াজ মাহফিল</h4>
+                                <p>২৫ এপ্রিল ২০২৫, বিকাল ৪:০০</p>
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="event-img" alt="Event">
+                            <div class="event-info">
+                                <h4>সাংস্কৃতিক অনুষ্ঠান</h4>
+                                <p>৩০ এপ্রিল ২০২৫, সন্ধ্যা ৭:০০</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-cloud-sun" style="color: #4caf50;"></i> আজকের আবহাওয়া</h3>
+                    </div>
+                    
+                    <div class="weather-main">
+                        <div class="weather-temp">
+                            <i class="fas fa-cloud-sun"></i>
+                            <div>
+                                <h2>২৮°C</h2>
+                                <p>আংশিক মেঘলা</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="weather-details">
+                        <div>
+                            আর্দ্রতা<br>
+                            <strong>৭২%</strong>
+                        </div>
+                        <div>
+                            বাতাস<br>
+                            <strong>১২ কি.মি./ঘণ্টা</strong>
+                        </div>
+                        <div>
+                            বায়ু মান<br>
+                            <strong>৪৮ (ভাল)</strong>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <div class="forecast-title">৭ দিনের পূর্বাভাস</div>
+                        <div class="forecast-grid">
+                            <div class="forecast-day">
+                                <span>বুধ</span>
+                                <i class="fas fa-cloud-sun"></i>
+                                <span>২৮°</span>
+                            </div>
+                            <div class="forecast-day">
+                                <span>বৃহঃ</span>
+                                <i class="fas fa-cloud-rain"></i>
+                                <span>২৭°</span>
+                            </div>
+                            <div class="forecast-day">
+                                <span>শনি</span>
+                                <i class="fas fa-cloud-rain"></i>
+                                <span>২৯°</span>
+                            </div>
+                            <div class="forecast-day">
+                                <span>রবি</span>
+                                <i class="fas fa-cloud-sun"></i>
+                                <span>৩০°</span>
+                            </div>
+                            <div class="forecast-day">
+                                <span>সোম</span>
+                                <i class="fas fa-cloud-sun"></i>
+                                <span>২৮°</span>
+                            </div>
+                            <div class="forecast-day">
+                                <span>মঙ্গল</span>
+                                <i class="fas fa-cloud-rain"></i>
+                                <span>২৯°</span>
+                            </div>
+                            <div class="forecast-day">
+                                <span>বুধ</span>
+                                <i class="fas fa-cloud-sun"></i>
+                                <span>২৭°</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agri-advice">
+                        <i class="fas fa-seedling"></i>
+                        <p>
+                            <strong>কৃষি পরামর্শ</strong>
+                            আগামী ৩ দিনের মধ্যে বৃষ্টি সম্ভাবনা রয়েছে। ধানের জমিতে সেচ প্রয়োজন।
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div>
+                © ২০২৫ আলমদীপাড়া ডিজিটাল গ্রাম। সর্বস্বত্ব সংরক্ষিত।
+            </div>
+            <div class="footer-links">
+                <a href="#">গোপনীয়তা নীতি</a>
+                <a href="#">ব্যবহারের শর্তাবলী</a>
+                <a href="#">যোগাযোগ</a>
+                <a href="#"><i class="fas fa-heart" style="color: #e74c3c;"></i> আলমদীপাড়া প্রামবাসীর জন্য</a>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

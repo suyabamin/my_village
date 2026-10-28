@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 export const MobileNav = ({ isOpen, onClose }) => {
-  const { currentUser, userProfile, logout } = useAuth();
+  const { currentUser, userProfile, logout, isEmailVerified } = useAuth();
   const location = useLocation();
   const drawerRef = useRef(null);
   const hasAdminRole = userProfile?.roles?.some(r => r.endsWith('_admin') || r === 'super_admin');
@@ -247,8 +247,25 @@ export const MobileNav = ({ isOpen, onClose }) => {
             gap: '0.2rem',
             flexShrink: 0,
           }}>
+            {!isEmailVerified && (
+              <div style={{
+                marginBottom: '0.5rem',
+                padding: '0.65rem 0.75rem',
+                backgroundColor: '#fffbeb',
+                border: '1px solid #fde68a',
+                borderRadius: '8px',
+                fontSize: '0.84rem',
+                color: '#92400e'
+              }}>
+                <div style={{ fontWeight: '700', marginBottom: '0.2rem' }}>⚠️ ইমেইল যাচাই বাকি</div>
+                <div>অ্যাকাউন্ট চালু করতে ইমেইল ভেরিফাই করুন।</div>
+                <Link to="/verify-email" style={{ display: 'inline-block', marginTop: '0.35rem', fontWeight: '700', color: '#b45309' }}>
+                  ভেরিফিকেশন পেজে যান →
+                </Link>
+              </div>
+            )}
             <Link
-              to="/dashboard"
+              to={isEmailVerified ? "/dashboard" : "/verify-email"}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -263,10 +280,10 @@ export const MobileNav = ({ isOpen, onClose }) => {
               }}
             >
               <LayoutDashboard size={19} aria-hidden="true" color="var(--text-muted)" />
-              ড্যাশবোর্ড
+              ড্যাশবোর্ড {!isEmailVerified && '⚠️'}
             </Link>
             <Link
-              to="/profile"
+              to={isEmailVerified ? "/profile" : "/verify-email"}
               style={{
                 display: 'flex',
                 alignItems: 'center',

@@ -57,7 +57,7 @@ function formatRelativeTime(ts) {
    Main Header Component
 ───────────────────────────────────────────────────────────── */
 export const Header = ({ onOpenMobileNav }) => {
-  const { currentUser, userProfile, logout, isSuperAdmin } = useAuth();
+  const { currentUser, userProfile, logout, isSuperAdmin, isEmailVerified } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { editModeEnabled, toggleEditMode } = useEditMode();
   const { notifications, unreadCount, markRead, markAllRead, setNotificationUser } = useNotification();
@@ -129,6 +129,7 @@ export const Header = ({ onOpenMobileNav }) => {
     || 'মেহমান';
 
   const userRoleLabel = (() => {
+    if (currentUser && !isEmailVerified)     return '⚠️ যাচাই বাকি';
     const roles = userProfile?.roles || [];
     if (roles.includes('super_admin'))       return 'সুপার এডমিন';
     if (roles.some(r => r.endsWith('_admin'))) return 'প্রশাসক';
@@ -383,17 +384,47 @@ export const Header = ({ onOpenMobileNav }) => {
                       <strong style={{ fontSize: '14px' }}>{userName}</strong>
                       <span className="dropdown-email">{currentUser.email}</span>
                     </div>
+
+                    {!isEmailVerified && (
+                      <div style={{
+                        margin: '6px 8px',
+                        padding: '8px 10px',
+                        backgroundColor: '#fffbeb',
+                        border: '1px solid #fde68a',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        color: '#92400e',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '6px'
+                      }}>
+                        <span>⚠️ অ্যাকাউন্ট যাচাই বাকি</span>
+                        <Link
+                          to="/verify-email"
+                          onClick={() => setUserDropdownOpen(false)}
+                          style={{
+                            color: '#b45309',
+                            fontWeight: '700',
+                            textDecoration: 'underline'
+                          }}
+                        >
+                          ভেরিফাই করুন
+                        </Link>
+                      </div>
+                    )}
+
                     <hr className="dropdown-divider" />
 
                     <Link
-                      to="/dashboard"
+                      to={isEmailVerified ? "/dashboard" : "/verify-email"}
                       className="dropdown-link"
                       onClick={() => setUserDropdownOpen(false)}
                     >
                       <LayoutDashboard size={15} /> আমার ড্যাশবোর্ড
                     </Link>
                     <Link
-                      to="/profile"
+                      to={isEmailVerified ? "/profile" : "/verify-email"}
                       className="dropdown-link"
                       onClick={() => setUserDropdownOpen(false)}
                     >
@@ -402,7 +433,7 @@ export const Header = ({ onOpenMobileNav }) => {
 
                     {hasAdminRole && (
                       <Link
-                        to="/admin"
+                        to={isEmailVerified ? "/admin" : "/verify-email"}
                         className="dropdown-link admin-link"
                         onClick={() => setUserDropdownOpen(false)}
                       >

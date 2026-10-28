@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export const RoleGuard = ({ requiredRole, children }) => {
-  const { hasRole, loading, currentUser } = useAuth();
+  const { hasRole, loading, currentUser, isEmailVerified } = useAuth();
 
   if (loading) {
     return (
@@ -15,6 +15,10 @@ export const RoleGuard = ({ requiredRole, children }) => {
 
   if (!currentUser) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (!isEmailVerified) {
+    return <Navigate to="/verify-email" replace />;
   }
 
   if (!hasRole(requiredRole)) {

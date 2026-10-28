@@ -19,7 +19,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export const SidebarNav = () => {
   const location = useLocation();
-  const { currentUser, userProfile } = useAuth();
+  const { currentUser, userProfile, isEmailVerified } = useAuth();
 
   const navItems = [
     { label: 'হোম', path: '/', icon: Home },
@@ -85,11 +85,11 @@ export const SidebarNav = () => {
           {currentUser && (
             <li>
               <NavLink
-                to="/dashboard"
+                to={isEmailVerified ? "/dashboard" : "/verify-email"}
                 className={location.pathname === '/dashboard' ? 'active' : ''}
               >
                 <LayoutDashboard size={17} strokeWidth={2.2} />
-                <span>আমার ড্যাশবোর্ড</span>
+                <span>আমার ড্যাশবোর্ড {!isEmailVerified && '⚠️'}</span>
               </NavLink>
             </li>
           )}
@@ -97,11 +97,11 @@ export const SidebarNav = () => {
           {hasAdminRole && (
             <li>
               <NavLink
-                to="/admin"
+                to={isEmailVerified ? "/admin" : "/verify-email"}
                 className={location.pathname.startsWith('/admin') ? 'active' : ''}
               >
                 <ShieldCheck size={17} strokeWidth={2.2} />
-                <span>এডমিন প্যানেল</span>
+                <span>এডমিন প্যানেল {!isEmailVerified && '⚠️'}</span>
               </NavLink>
             </li>
           )}

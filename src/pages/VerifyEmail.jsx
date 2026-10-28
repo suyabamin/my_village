@@ -246,10 +246,10 @@ export const VerifyEmail = () => {
             </div>
           )}
 
-          {/* Detailed Instructions Box to Find Verification Link */}
+          {/* Detailed Instructions Box to Find Verification Link & Move to Inbox */}
           <div style={{
             textAlign: 'left',
-            padding: '1rem',
+            padding: '1.1rem',
             borderRadius: '10px',
             backgroundColor: '#fffbeb',
             border: '1px solid #fef3c7',
@@ -258,23 +258,23 @@ export const VerifyEmail = () => {
             lineHeight: 1.6,
             marginBottom: '1.5rem'
           }}>
-            <div style={{ fontWeight: '700', marginBottom: '0.35rem', color: '#78350f', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <AlertTriangle size={15} /> লিঙ্কটি খুঁজে পেতে করণীয়:
+            <div style={{ fontWeight: '700', marginBottom: '0.45rem', color: '#78350f', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem' }}>
+              <AlertTriangle size={16} /> ইমেইলটি কেন স্প্যামে যায় এবং কীভাবে ইনবক্সে পাবেন?
             </div>
-            <ul style={{ paddingLeft: '1.15rem', margin: 0 }}>
+            <ul style={{ paddingLeft: '1.15rem', margin: '0 0 0.75rem 0' }}>
               <li>
-                <strong>স্প্যাম (Spam) বা প্রমোশন ফোল্ডার:</strong> গুগল স্বয়ংক্রিয়ভাবে প্রথমবার নো-রিপ্লাই ইমেইলগুলো স্প্যামে পাঠিয়ে দিতে পারে। জিমেইল অ্যাপের বাম পাশের মেন্যু থেকে <strong>Spam</strong> ফোল্ডার চেক করুন।
+                <strong>গুগল জিমেইল স্প্যাম ফিল্টার:</strong> ফায়ারবেসের নো-রিপ্লাই ইমেইলগুলো স্বয়ংক্রিয় অ্যালগরিদমের কারণে প্রথমবার জিমেইলের <strong>Spam</strong> বা <strong>Promotions</strong> ফোল্ডারে জমা হয়।
               </li>
               <li>
-                <strong>প্রেরকের নাম:</strong> ইমেইলটি এসেছে <code>noreply@alamdipara-digital-village.firebaseapp.com</code> থেকে।
+                <strong>ইনবক্সে স্থানান্তর করার নিয়ম:</strong> জিমেইলের স্প্যাম ফোল্ডারে গিয়ে ইমেইলটি খুলুন এবং উপরে থাকা <strong>"Report not spam" (স্প্যাম নয়)</strong> বাটনে ক্লিক করুন। এর সাথে সাথে ইমেইলটি আপনার মূল ইনবক্সে চলে আসবে এবং ভবিষ্যতের সকল মেইল সরাসরি ইনবক্সে আসবে।
               </li>
               <li>
-                <strong>বিষয় (Subject):</strong> <code>Verify your email for alamdipara-digital-village</code>
-              </li>
-              <li>
-                <strong>স্বয়ংক্রিয় যাচাই:</strong> আপনি ইমেইলের লিঙ্কে ক্লিক করার পর পেজটি স্বয়ংক্রিয়ভাবে চালু হয়ে যাবে (বা রিফ্রেশ বাটনে ক্লিক করুন)।
+                <strong>প্রেরক:</strong> <code>noreply@alamdipara-digital-village.firebaseapp.com</code>
               </li>
             </ul>
+            <div style={{ padding: '0.5rem 0.75rem', backgroundColor: '#fef3c7', borderRadius: '6px', fontSize: '0.8rem', border: '1px dashed #f59e0b' }}>
+              💡 <strong>টিপস:</strong> লিঙ্কে ক্লিক করা সম্পন্ন হলে নিচের <strong>"ভেরিফিকেশন স্ট্যাটাস রিফ্রেশ করুন"</strong> বাটনে চাপ দিন অথবা এই পেজটি নিজেই ৩-৪ সেকেন্ডে স্বয়ংক্রিয়ভাবে খুলে যাবে।
+            </div>
           </div>
 
           {/* Action Buttons */}

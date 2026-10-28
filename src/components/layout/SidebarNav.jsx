@@ -28,7 +28,7 @@ export const SidebarNav = () => {
     { label: 'খেলাধুলা', path: '/sports', icon: Trophy },
     { label: 'শিক্ষা প্রতিষ্ঠান', path: '/education', icon: BookOpen },
     { label: 'মসজিদ', path: '/mosques', icon: Building2 },
-    { label: 'যুব ইউনিয়ন সংঘ', path: '/organization', icon: Users },
+    { label: 'যুব সংঘ', path: '/organization', icon: Users },
     { label: 'সাংস্কৃতিক অনুষ্ঠান', path: '/culture', icon: Music },
     { label: 'সামাজিক অনুষ্ঠান', path: '/social', icon: HeartHandshake },
     { label: 'জরুরি মিটিং', path: '/emergency', icon: AlertCircle },

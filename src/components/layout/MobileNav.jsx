@@ -68,7 +68,7 @@ export const MobileNav = ({ isOpen, onClose }) => {
     { label: 'খেলাধুলা ও টুর্নামেন্ট', path: '/sports', icon: Trophy },
     { label: 'শিক্ষা প্রতিষ্ঠান', path: '/education', icon: GraduationCap },
     { label: 'মসজিদ', path: '/mosques', icon: Building2 },
-    { label: 'যুব উন্নয়ন সংঘ', path: '/organization', icon: Users },
+    { label: 'যুব সংঘ', path: '/organization', icon: Users },
     { label: 'জরুরি সভা', path: '/emergency', icon: ShieldAlert },
     { label: 'সাংস্কৃতিক অনুষ্ঠান', path: '/culture', icon: Sparkles },
     { label: 'সামাজিক কর্মকাণ্ড', path: '/social', icon: HeartHandshake },

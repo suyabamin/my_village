@@ -172,7 +172,7 @@ export const Home = () => {
     {
       id: 'youth',
       cls: 'card-youth',
-      title: 'যুব ইউনিয়ন',
+      title: 'যুব সংঘ',
       subtitle: 'সদস্য, কার্যক্রম',
       icon: Users,
       image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',

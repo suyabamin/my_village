@@ -22,7 +22,8 @@ import {
   Tv,
   Megaphone,
   BookOpen,
-  Leaf
+  Leaf,
+  Shield
 } from 'lucide-react';
 import { getCollectionData, initialVillageData } from '../services/dbService';
 import { subscribeLiveMatches } from '../services/sportsService';
@@ -466,6 +467,40 @@ export const Home = () => {
             })}
           </div>
         </div>
+
+        {/* 2b. Village Guard Quick-Access Banner */}
+        <Link
+          to="/organization?tab=guard"
+          className="guard-quick-banner"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            background: 'linear-gradient(135deg, #14532d 0%, #166534 60%, #15803d 100%)',
+            borderRadius: '14px',
+            padding: '1rem 1.25rem',
+            color: '#ffffff',
+            textDecoration: 'none',
+            marginBottom: '1.25rem',
+            boxShadow: '0 4px 16px rgba(21,128,61,0.22)',
+            transition: 'transform 0.18s ease, box-shadow 0.18s ease'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(21,128,61,0.32)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(21,128,61,0.22)'; }}
+        >
+          <div style={{
+            width: '46px', height: '46px', borderRadius: '12px',
+            background: 'rgba(255,255,255,0.18)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+          }}>
+            <span style={{ fontSize: '1.5rem' }}>🛡️</span>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: '800', fontSize: '1rem', letterSpacing: '0.01em' }}>সাপ্তাহিক গ্রাম পাহারা</div>
+            <div style={{ fontSize: '0.82rem', opacity: 0.88, marginTop: '2px' }}>সাপ্তাহিক পাহারার সময়সূচি দেখুন</div>
+          </div>
+          <ArrowRight size={18} style={{ opacity: 0.85 }} />
+        </Link>
 
         {/* 3. Map Section ("ডিজিটাল ভিলেজ ম্যাপ") */}
         <div className="map-section">

@@ -14,14 +14,18 @@ import {
   Info,
   X,
   Save,
-  UserCheck
+  UserCheck,
+  Search,
+  User
 } from 'lucide-react';
 import { 
   WEEKDAYS, 
   fetchGuardSchedule, 
-  addGuardEntry, 
+  addGuardEntry,
+  assignGuardToDays,
   updateGuardEntry, 
   deleteGuardEntry,
+  fetchRegisteredUsers,
   getBangladeshTimeInfo,
   isShiftCurrentlyActive
 } from '../../services/organizationService';
@@ -53,6 +57,15 @@ export const VillageGuardSchedule = () => {
     displayOrder: 1,
     isPublished: true
   });
+
+  // Registered user search state (for admin modal)
+  const [registeredUsers, setRegisteredUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [selectedProfileImageUrl, setSelectedProfileImageUrl] = useState('');
+  const [assignMultiDays, setAssignMultiDays] = useState(false);
+  const [selectedWeekdays, setSelectedWeekdays] = useState([]);
 
   // Load schedule
   const loadData = async () => {
@@ -105,6 +118,11 @@ export const VillageGuardSchedule = () => {
 
   const handleOpenAdd = (dayKey) => {
     setEditingId(null);
+    setSelectedUserId('');
+    setSelectedProfileImageUrl('');
+    setUserSearchTerm('');
+    setAssignMultiDays(false);
+    setSelectedWeekdays([dayKey || selectedDay]);
     setForm({
       weekday: dayKey || selectedDay,
       guardName: '',
@@ -116,11 +134,24 @@ export const VillageGuardSchedule = () => {
       displayOrder: dayEntries.length + 1,
       isPublished: true
     });
+    // Load registered users for admin picker
+    if (canManage && registeredUsers.length === 0) {
+      setLoadingUsers(true);
+      fetchRegisteredUsers().then(users => {
+        setRegisteredUsers(users || []);
+        setLoadingUsers(false);
+      }).catch(() => setLoadingUsers(false));
+    }
     setShowModal(true);
   };
 
   const handleOpenEdit = (entry) => {
     setEditingId(entry.id);
+    setSelectedUserId(entry.userId || '');
+    setSelectedProfileImageUrl(entry.profileImageUrl || '');
+    setUserSearchTerm('');
+    setAssignMultiDays(false);
+    setSelectedWeekdays([entry.weekday]);
     setForm({
       weekday: entry.weekday,
       guardName: entry.guardName || '',
@@ -132,6 +163,13 @@ export const VillageGuardSchedule = () => {
       displayOrder: entry.displayOrder || 1,
       isPublished: entry.isPublished !== false
     });
+    if (canManage && registeredUsers.length === 0) {
+      setLoadingUsers(true);
+      fetchRegisteredUsers().then(users => {
+        setRegisteredUsers(users || []);
+        setLoadingUsers(false);
+      }).catch(() => setLoadingUsers(false));
+    }
     setShowModal(true);
   };
 
@@ -155,12 +193,23 @@ export const VillageGuardSchedule = () => {
 
     setSaving(true);
     try {
+      const entryData = {
+        ...form,
+        userId: selectedUserId || '',
+        profileImageUrl: selectedProfileImageUrl || ''
+      };
+
       if (editingId) {
-        await updateGuardEntry(editingId, form);
-        setScheduleList(prev => prev.map(item => item.id === editingId ? { ...item, ...form } : item));
+        await updateGuardEntry(editingId, entryData);
+        setScheduleList(prev => prev.map(item => item.id === editingId ? { ...item, ...entryData } : item));
         addToast('পাহারা ডিউটি তথ্য সফলভাবে আপডেট হয়েছে!', 'success');
+      } else if (!editingId && assignMultiDays && selectedWeekdays.length > 1) {
+        // Multi-day assignment
+        const created = await assignGuardToDays({ ...entryData, weekdays: selectedWeekdays }, currentUser);
+        setScheduleList(prev => [...prev, ...created]);
+        addToast(`${selectedWeekdays.length}টি দিনে পাহারা শিফট সফলভাবে যোগ করা হয়েছে!`, 'success');
       } else {
-        const newEntry = await addGuardEntry(form, currentUser);
+        const newEntry = await addGuardEntry({ ...entryData, weekday: selectedWeekdays[0] || form.weekday }, currentUser);
         setScheduleList(prev => [...prev, newEntry]);
         addToast('নতুন পাহারা ডিউটি সফলভাবে যোগ করা হয়েছে!', 'success');
       }
@@ -410,20 +459,38 @@ export const VillageGuardSchedule = () => {
 
                   {/* Header: Guard Name & Order */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.65rem' }}>
-                    <div style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      background: isCurrentShift ? '#16a34a' : '#2563eb',
-                      color: '#ffffff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: '800',
-                      fontSize: '0.85rem'
-                    }}>
-                      {index + 1}
-                    </div>
+                    {/* Profile photo or fallback avatar */}
+                    {entry.profileImageUrl ? (
+                      <img
+                        src={entry.profileImageUrl}
+                        alt={entry.guardName}
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: isCurrentShift ? '2px solid #16a34a' : '2px solid #cbd5e1',
+                          flexShrink: 0
+                        }}
+                        onError={e => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: isCurrentShift ? '#16a34a' : '#2563eb',
+                        color: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: '800',
+                        fontSize: '0.85rem',
+                        flexShrink: 0
+                      }}>
+                        {(entry.guardName || '?').charAt(0)}
+                      </div>
+                    )}
                     <div>
                       <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', color: 'var(--text-main, #0f172a)' }}>
                         {entry.guardName}
@@ -462,7 +529,8 @@ export const VillageGuardSchedule = () => {
 
                   {/* Footer & Actions */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px solid var(--border-color, #e2e8f0)', marginTop: '0.4rem' }}>
-                    {entry.phone ? (
+                    {/* Admin can see phone; public sees nothing to protect privacy */}
+                    {canManage && entry.phone ? (
                       <a
                         href={`tel:${entry.phone}`}
                         style={{
@@ -562,19 +630,150 @@ export const VillageGuardSchedule = () => {
             </div>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-              {/* Weekday Selection */}
-              <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', marginBottom: '0.35rem' }}>বার (Weekday) *</label>
-                <select
-                  value={form.weekday}
-                  onChange={e => setForm(prev => ({ ...prev, weekday: e.target.value }))}
-                  style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: '8px', border: '1.5px solid var(--border-color, #cbd5e1)', background: 'var(--bg-main, #fff)', fontSize: '0.9rem' }}
-                >
-                  {WEEKDAYS.map(w => (
-                    <option key={w.key} value={w.key}>{w.nameBn}</option>
-                  ))}
-                </select>
+
+              {/* ── Registered User Search Panel (admin only, add mode) ── */}
+              <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: '10px', padding: '0.85rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '800', marginBottom: '0.5rem', color: '#15803d' }}>
+                  👤 নিবন্ধিত ব্যবহারকারী থেকে পাহারাদার নির্বাচন করুন
+                </label>
+                {selectedUserId && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#dcfce7', borderRadius: '8px', padding: '6px 10px', marginBottom: '0.5rem' }}>
+                    {selectedProfileImageUrl ? (
+                      <img src={selectedProfileImageUrl} alt="" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; }} />
+                    ) : (
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#16a34a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: '800' }}>
+                        {(form.guardName || '?').charAt(0)}
+                      </div>
+                    )}
+                    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#15803d', flex: 1 }}>{form.guardName}</span>
+                    <button type="button" onClick={() => { setSelectedUserId(''); setSelectedProfileImageUrl(''); setForm(prev => ({ ...prev, guardName: '' })); }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', padding: '0' }}>
+                      <X size={14} />
+                    </button>
+                  </div>
+                )}
+                <div style={{ position: 'relative' }}>
+                  <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+                  <input
+                    type="text"
+                    placeholder="নাম, ইমেইল বা ফোন দিয়ে খুঁজুন..."
+                    value={userSearchTerm}
+                    onChange={e => setUserSearchTerm(e.target.value)}
+                    style={{ width: '100%', padding: '0.5rem 0.75rem 0.5rem 2rem', borderRadius: '7px', border: '1.5px solid #86efac', background: '#fff', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+                {loadingUsers && (
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.4rem', textAlign: 'center' }}>ব্যবহারকারী লোড হচ্ছে...</div>
+                )}
+                {!loadingUsers && userSearchTerm.trim().length >= 1 && (
+                  <div style={{ marginTop: '0.4rem', maxHeight: '140px', overflowY: 'auto', borderRadius: '7px', border: '1px solid #bbf7d0', background: '#fff' }}>
+                    {registeredUsers
+                      .filter(u => {
+                        const q = userSearchTerm.toLowerCase();
+                        return (
+                          (u.displayName || '').toLowerCase().includes(q) ||
+                          (u.email || '').toLowerCase().includes(q) ||
+                          (u.phone || '').includes(q)
+                        );
+                      })
+                      .slice(0, 10)
+                      .map(u => (
+                        <button
+                          key={u.uid}
+                          type="button"
+                          onClick={() => {
+                            setSelectedUserId(u.uid);
+                            setSelectedProfileImageUrl(u.photoURL || '');
+                            setForm(prev => ({ ...prev, guardName: u.displayName }));
+                            setUserSearchTerm('');
+                          }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            width: '100%', padding: '6px 10px', border: 'none',
+                            background: selectedUserId === u.uid ? '#dcfce7' : 'transparent',
+                            cursor: 'pointer', textAlign: 'left',
+                            borderBottom: '1px solid #f0fdf4'
+                          }}
+                        >
+                          {u.photoURL ? (
+                            <img src={u.photoURL} alt="" style={{ width: '26px', height: '26px', borderRadius: '50%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; }} />
+                          ) : (
+                            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: '800', flexShrink: 0 }}>
+                              {(u.displayName || '?').charAt(0)}
+                            </div>
+                          )}
+                          <div>
+                            <div style={{ fontSize: '0.83rem', fontWeight: '700', color: '#0f172a' }}>{u.displayName}</div>
+                            <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{u.email}</div>
+                          </div>
+                        </button>
+                      ))
+                    }
+                    {registeredUsers.filter(u => {
+                      const q = userSearchTerm.toLowerCase();
+                      return (u.displayName || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q) || (u.phone || '').includes(q);
+                    }).length === 0 && (
+                      <div style={{ fontSize: '0.8rem', color: '#64748b', padding: '8px 12px' }}>কোনো ব্যবহারকারী পাওয়া যায়নি।</div>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {/* Multi-day assignment toggle (add mode only) */}
+              {!editingId && (
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '700' }}>
+                  <input
+                    type="checkbox"
+                    checked={assignMultiDays}
+                    onChange={e => setAssignMultiDays(e.target.checked)}
+                    style={{ width: '16px', height: '16px', accentColor: '#16a34a' }}
+                  />
+                  একাধিক দিনে একসাথে নিয়োগ করুন
+                </label>
+              )}
+
+              {/* Weekday Selection */}
+              {!assignMultiDays || editingId ? (
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', marginBottom: '0.35rem' }}>বার (Weekday) *</label>
+                  <select
+                    value={form.weekday}
+                    onChange={e => {
+                      setForm(prev => ({ ...prev, weekday: e.target.value }));
+                      setSelectedWeekdays([e.target.value]);
+                    }}
+                    style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: '8px', border: '1.5px solid var(--border-color, #cbd5e1)', background: 'var(--bg-main, #fff)', fontSize: '0.9rem' }}
+                  >
+                    {WEEKDAYS.map(w => (
+                      <option key={w.key} value={w.key}>{w.nameBn}</option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', marginBottom: '0.5rem' }}>বার নির্বাচন করুন (একাধিক) *</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {WEEKDAYS.map(w => (
+                      <label key={w.key} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: '0.83rem', fontWeight: '600',
+                        background: selectedWeekdays.includes(w.key) ? '#dcfce7' : 'var(--bg-elevated, #f1f5f9)',
+                        border: selectedWeekdays.includes(w.key) ? '1.5px solid #16a34a' : '1.5px solid var(--border-color)',
+                        borderRadius: '8px', padding: '4px 10px' }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedWeekdays.includes(w.key)}
+                          onChange={e => {
+                            setSelectedWeekdays(prev =>
+                              e.target.checked ? [...prev, w.key] : prev.filter(d => d !== w.key)
+                            );
+                          }}
+                          style={{ accentColor: '#16a34a' }}
+                        />
+                        {w.nameBn}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Guard Name */}
               <div>

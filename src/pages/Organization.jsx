@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Users, 
   ShieldCheck, 
@@ -19,8 +20,24 @@ export const Organization = () => {
   const { hasRole, isSuperAdmin } = useAuth();
   const canManage = hasRole('organization_admin') || isSuperAdmin;
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+
   // Tabs: 'overview' | 'program' | 'guard' | 'gallery'
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(
+    ['overview', 'program', 'guard', 'gallery'].includes(tabParam) ? tabParam : 'overview'
+  );
+
+  useEffect(() => {
+    if (tabParam && ['overview', 'program', 'guard', 'gallery'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSearchParams(tab === 'overview' ? {} : { tab });
+  };
 
   return (
     <div className="container" style={{ padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(0.85rem, 3vw, 1.25rem)' }}>
@@ -67,7 +84,7 @@ export const Organization = () => {
         WebkitOverflowScrolling: 'touch' 
       }}>
         <button 
-          onClick={() => setActiveTab('overview')} 
+          onClick={() => handleTabChange('overview')} 
           className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-secondary'}`} 
           style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
         >
@@ -75,7 +92,7 @@ export const Organization = () => {
         </button>
 
         <button 
-          onClick={() => setActiveTab('program')} 
+          onClick={() => handleTabChange('program')} 
           className={`btn ${activeTab === 'program' ? 'btn-primary' : 'btn-secondary'}`} 
           style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
         >
@@ -83,7 +100,7 @@ export const Organization = () => {
         </button>
 
         <button 
-          onClick={() => setActiveTab('guard')} 
+          onClick={() => handleTabChange('guard')} 
           className={`btn ${activeTab === 'guard' ? 'btn-primary' : 'btn-secondary'}`} 
           style={{ 
             whiteSpace: 'nowrap', 
@@ -96,7 +113,7 @@ export const Organization = () => {
         </button>
 
         <button 
-          onClick={() => setActiveTab('gallery')} 
+          onClick={() => handleTabChange('gallery')} 
           className={`btn ${activeTab === 'gallery' ? 'btn-primary' : 'btn-secondary'}`} 
           style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
         >

@@ -549,6 +549,48 @@ export const deleteOrganizationProgram = async (id) => {
 
 // ─── 2. WEEKLY VILLAGE GUARD SCHEDULE (village_guard_schedule) ───────────────
 
+/**
+ * Fetch Registered Users from Firebase 'users' collection for Guard Assignment.
+ */
+export const fetchRegisteredUsers = async () => {
+  let list = [];
+  try {
+    if (isLiveFirebaseConfigured) {
+      const snap = await getDocs(collection(db, 'users'));
+      if (!snap.empty) {
+        list = snap.docs.map(d => {
+          const data = d.data();
+          return {
+            uid: d.id,
+            id: d.id,
+            displayName: data.displayName || data.name || data.fullName || 'নামবিহীন ব্যবহারকারী',
+            email: data.email || '',
+            phone: data.phone || data.phoneNumber || '',
+            photoURL: data.photoURL || data.profileImage || '',
+            roles: data.roles || []
+          };
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("fetchRegisteredUsers fallback:", err.message);
+  }
+
+  // Fallback to local cache if Firestore is offline
+  if (!list || list.length === 0) {
+    try {
+      const cached = localStorage.getItem('alamdipara_registered_users_cache');
+      if (cached) list = JSON.parse(cached);
+    } catch (_) {}
+  } else {
+    try {
+      localStorage.setItem('alamdipara_registered_users_cache', JSON.stringify(list));
+    } catch (_) {}
+  }
+
+  return list;
+};
+
 export const fetchGuardSchedule = async (includeUnpublished = false) => {
   let list = [];
 
@@ -582,8 +624,12 @@ export const fetchGuardSchedule = async (includeUnpublished = false) => {
 export const addGuardEntry = async (entryData, currentUser) => {
   const newEntry = {
     ...entryData,
+    userId: entryData.userId || '',
+    guardName: entryData.guardName || '',
+    profileImageUrl: entryData.profileImageUrl || '',
     displayOrder: Number(entryData.displayOrder || 1),
     isPublished: entryData.isPublished !== false,
+    assignedBy: currentUser?.uid || 'admin',
     createdBy: currentUser?.uid || 'admin',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -612,6 +658,24 @@ export const addGuardEntry = async (entryData, currentUser) => {
 
   notifyGuardUpdate();
   return newEntry;
+};
+
+/**
+ * Assign a registered user to multiple weekdays at once.
+ */
+export const assignGuardToDays = async (assignmentData, currentUser) => {
+  const { weekdays = [], ...baseData } = assignmentData;
+  const createdEntries = [];
+
+  for (const day of weekdays) {
+    const entry = await addGuardEntry({
+      ...baseData,
+      weekday: day
+    }, currentUser);
+    createdEntries.push(entry);
+  }
+
+  return createdEntries;
 };
 
 export const updateGuardEntry = async (id, updatedFields) => {

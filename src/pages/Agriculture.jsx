@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sprout, Wrench, FileText, Plus, Phone, Calendar, Clock, MapPin, Tag } from 'lucide-react';
+import { Sprout, Wrench, FileText, Plus, Phone, Calendar, Clock, MapPin, Tag, CloudSun } from 'lucide-react';
 import { getCollectionData, addDocument, initialVillageData } from '../services/dbService';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
@@ -114,16 +114,22 @@ export const Agriculture = () => {
     <div className="container" style={{ paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
       
       {/* Header */}
-      <div style={{ marginBottom: '1.75rem' }}>
-        <div className="badge badge-green" style={{ marginBottom: '0.5rem' }}>
-          কৃষিপ্রধান গ্রাম আলমদীপাড়া
+      <div style={{ marginBottom: '1.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ flex: 1, minWidth: '260px' }}>
+          <div className="badge badge-green" style={{ marginBottom: '0.5rem' }}>
+            কৃষিপ্রধান গ্রাম আলমদীপাড়া
+          </div>
+          <h1 style={{ fontSize: 'clamp(1.6rem, 4.5vw, 2.2rem)', fontWeight: '800', marginBottom: '0.4rem' }}>
+            কৃষি সেবা, মাঠ ও জমি লিজ পোর্টাল
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 'clamp(0.88rem, 2.2vw, 1rem)', margin: 0 }}>
+            আলমদীপাড়া গ্রামের লাটিয়াকুড়ি, চড়ে বন্দ ও মাগুড়া বন্দ কৃষি মাঠের রিয়েলটাইম অবস্থা এবং কৃষিযন্ত্রপাতি ও জমি লিজের বিজ্ঞাপন।
+          </p>
         </div>
-        <h1 style={{ fontSize: 'clamp(1.6rem, 4.5vw, 2.2rem)', fontWeight: '800', marginBottom: '0.4rem' }}>
-          কৃষি সেবা, মাঠ ও জমি লিজ পোর্টাল
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: 'clamp(0.88rem, 2.2vw, 1rem)' }}>
-          আলমদীপাড়া গ্রামের লাটিয়াকুড়ি, চড়ে বন্দ ও মাগুড়া বন্দ কৃষি মাঠের রিয়েলটাইম অবস্থা এবং কৃষিযন্ত্রপাতি ও জমি লিজের বিজ্ঞাপন।
-        </p>
+
+        <Link to="/weather" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+          <CloudSun size={17} /> লাইভ আবহাওয়া ও কৃষি পরামর্শ →
+        </Link>
       </div>
 
       {/* Touch Scrollable Filter Tabs */}

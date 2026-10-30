@@ -169,6 +169,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if hasRole('organization_admin');
     }
+    match /village_guard_schedule/{guardId} {
+      allow read: if true;
+      allow write: if hasRole('organization_admin');
+    }
     
     // ─── Cultural / Social / Emergency / Religious Events ────────────────────
     match /cultural_events/{evtId} {

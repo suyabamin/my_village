@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { Shield, Users, Settings, FileText, CheckCircle2, Loader2, UserCheck, Image as ImageIcon, Trophy, Check, X, MapPin, Layout } from 'lucide-react';
+import { Shield, Users, Settings, FileText, CheckCircle2, Loader2, UserCheck, Image as ImageIcon, Trophy, Check, X, MapPin, Layout, Calendar } from 'lucide-react';
 import { getCollectionData, updateDocument, initialVillageData } from '../services/dbService';
 import { getTournaments, updateTournamentStatus } from '../services/sportsService';
 import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
@@ -9,12 +9,16 @@ import { db } from '../config/firebase';
 import VillageImageAdminManager from '../components/village/VillageImageAdminManager';
 import VillageMapAdminManager from '../components/admin/VillageMapAdminManager';
 import ContentAdminManager from '../components/admin/ContentAdminManager';
+import VillageGuardSchedule from '../components/organization/VillageGuardSchedule';
+import DailyActivitiesSection from '../components/organization/DailyActivitiesSection';
+import OrganizationPhotoGallery from '../components/organization/OrganizationPhotoGallery';
 
 export const Admin = () => {
-  const { isSuperAdmin, currentUser, userProfile } = useAuth();
+  const { isSuperAdmin, currentUser, userProfile, hasRole } = useAuth();
   const { addToast } = useNotification();
 
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roles' | 'tournaments' | 'settings' | 'village_images' | 'map_management' | 'content_management' | 'audit'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roles' | 'tournaments' | 'settings' | 'village_images' | 'map_management' | 'content_management' | 'organization' | 'audit'
+  const [orgSubTab, setOrgSubTab] = useState('guard'); // 'guard' | 'programs' | 'gallery'
 
   // Configurable Site Settings
   const [siteSettings, setSiteSettings] = useState(initialVillageData.site_settings);
@@ -207,6 +211,11 @@ export const Admin = () => {
         {isSuperAdmin && (
           <button onClick={() => setActiveTab('content_management')} className={`btn ${activeTab === 'content_management' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
             📝 ওয়েবসাইট কন্টেন্ট
+          </button>
+        )}
+        {(isSuperAdmin || hasRole('organization_admin')) && (
+          <button onClick={() => setActiveTab('organization')} className={`btn ${activeTab === 'organization' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+            🛡️ যুব সংঘ ও পাহারা
           </button>
         )}
       </div>
@@ -433,6 +442,47 @@ export const Admin = () => {
       {/* Tab: Website Content Management */}
       {activeTab === 'content_management' && isSuperAdmin && (
         <ContentAdminManager />
+      )}
+
+      {/* Tab: Youth Organization & Village Guard Management */}
+      {activeTab === 'organization' && (isSuperAdmin || hasRole('organization_admin')) && (
+        <div style={{ marginTop: '0.5rem' }}>
+          <div style={{
+            display: 'flex',
+            gap: '0.5rem',
+            marginBottom: '1.5rem',
+            borderBottom: '1px solid var(--border-color, #e2e8f0)',
+            paddingBottom: '0.6rem',
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch'
+          }}>
+            <button
+              onClick={() => setOrgSubTab('guard')}
+              className={`btn ${orgSubTab === 'guard' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              <Shield size={16} /> সাপ্তাহিক গ্রাম পাহারা
+            </button>
+            <button
+              onClick={() => setOrgSubTab('programs')}
+              className={`btn ${orgSubTab === 'programs' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              <Calendar size={16} /> দৈনিক কার্যক্রম ও সময়সূচি
+            </button>
+            <button
+              onClick={() => setOrgSubTab('gallery')}
+              className={`btn ${orgSubTab === 'gallery' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              <ImageIcon size={16} /> ফটো গ্যালারি ব্যবস্থাপনা
+            </button>
+          </div>
+
+          {orgSubTab === 'guard' && <VillageGuardSchedule />}
+          {orgSubTab === 'programs' && <DailyActivitiesSection />}
+          {orgSubTab === 'gallery' && <OrganizationPhotoGallery />}
+        </div>
       )}
 
     </div>

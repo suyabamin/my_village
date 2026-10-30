@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Save, Upload, RefreshCw, Edit2, X, Eye, EyeOff, Type, Image as ImageIcon, Star } from 'lucide-react';
+import { Save, Upload, RefreshCw, Edit2, X, Eye, EyeOff, Type, Image as ImageIcon, Star, Plus, Trash2 } from 'lucide-react';
 import {
   fetchSiteContent,
   updateSiteContent,
   fetchServiceCards,
   updateServiceCard,
+  addServiceCard,
+  deleteServiceCard,
   uploadIconOrImage,
   DEFAULT_SITE_CONTENT,
   DEFAULT_SERVICE_CARDS
@@ -74,8 +76,24 @@ export default function ContentAdminManager() {
   };
 
   // ── Card Handlers ──
+  const handleAddNewCard = () => {
+    setEditingCard({
+      id: '',
+      isNew: true,
+      title: '',
+      description: '',
+      link: '/',
+      iconEmoji: '⭐',
+      iconUrl: '',
+      bgImageUrl: '',
+      bgGradient: `mob-card-${(cards.length % 9) + 1}`,
+      displayOrder: cards.length + 1,
+      isActive: true
+    });
+  };
+
   const handleEditCard = (card) => {
-    setEditingCard({ ...card });
+    setEditingCard({ ...card, isNew: false });
   };
 
   const handleCardChange = (field, value) => {
@@ -87,7 +105,8 @@ export default function ContentAdminManager() {
     if (!file || !editingCard) return;
     setIconUploading(true);
     try {
-      const url = await uploadIconOrImage(file, true, editingCard.id);
+      const cardIdentifier = editingCard.id || editingCard.link || 'new-card';
+      const url = await uploadIconOrImage(file, true, cardIdentifier);
       if (!url) throw new Error('URL পাওয়া যায়নি');
       handleCardChange('iconUrl', url);
       addToast('আইকন আপলোড সফল!', 'success');
@@ -104,7 +123,8 @@ export default function ContentAdminManager() {
     if (!file || !editingCard) return;
     setBgUploading(true);
     try {
-      const url = await uploadIconOrImage(file, false, editingCard.id);
+      const cardIdentifier = editingCard.id || editingCard.link || 'new-card';
+      const url = await uploadIconOrImage(file, false, cardIdentifier);
       if (!url) throw new Error('URL পাওয়া যায়নি');
       handleCardChange('bgImageUrl', url);
       addToast('ব্যাকগ্রাউন্ড ছবি আপলোড সফল!', 'success');
@@ -119,16 +139,38 @@ export default function ContentAdminManager() {
   const handleSaveCard = async (e) => {
     e.preventDefault();
     if (!editingCard) return;
+    if (!editingCard.title?.trim()) {
+      addToast('কার্ডের শিরোনাম লিখুন।', 'error');
+      return;
+    }
+
     setCardSaving(true);
     try {
-      await updateServiceCard(editingCard.id, editingCard);
-      setCards(prev => prev.map(c => c.id === editingCard.id ? { ...c, ...editingCard } : c));
-      addToast(`"${editingCard.title}" কার্ড সফলভাবে আপডেট হয়েছে!`, 'success');
+      if (editingCard.isNew) {
+        const created = await addServiceCard(editingCard);
+        setCards(prev => [...prev.filter(c => c.id !== created.id), created]);
+        addToast(`"${created.title}" নতুন সার্ভিস কার্ড যোগ করা হয়েছে!`, 'success');
+      } else {
+        const updated = await updateServiceCard(editingCard.id, editingCard);
+        setCards(prev => prev.map(c => c.id === editingCard.id ? { ...c, ...updated } : c));
+        addToast(`"${editingCard.title}" কার্ড সফলভাবে আপডেট হয়েছে!`, 'success');
+      }
       setEditingCard(null);
     } catch (err) {
       addToast(`কার্ড সংরক্ষণে সমস্যা: ${err.message}`, 'error');
     } finally {
       setCardSaving(false);
+    }
+  };
+
+  const handleDeleteCard = async (card) => {
+    if (!window.confirm(`আপনি কি নিশ্চিত যে "${card.title}" কার্ডটি মুছে ফেলতে চান?`)) return;
+    try {
+      await deleteServiceCard(card.id);
+      setCards(prev => prev.filter(c => c.id !== card.id));
+      addToast(`"${card.title}" কার্ড মুছে ফেলা হয়েছে!`, 'success');
+    } catch (err) {
+      addToast(`মুছে ফেলতে সমস্যা: ${err.message}`, 'error');
     }
   };
 
@@ -310,22 +352,24 @@ export default function ContentAdminManager() {
           {editingCard && (
             <div style={{ ...cardStyle, borderColor: '#2563eb', borderWidth: '2px', marginBottom: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0, fontWeight: '700', color: '#2563eb' }}>✏️ কার্ড সম্পাদনা: {editingCard.title}</h3>
+                <h3 style={{ margin: 0, fontWeight: '700', color: '#2563eb' }}>
+                  {editingCard.isNew ? '➕ নতুন সার্ভিস কার্ড যোগ' : `✏️ কার্ড সম্পাদনা: ${editingCard.title}`}
+                </h3>
                 <button onClick={() => setEditingCard(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
               </div>
               <form onSubmit={handleSaveCard}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem' }}>
                   <div>
-                    <label style={labelStyle}>কার্ড শিরোনাম (বাংলা)</label>
-                    <input style={inputStyle} value={editingCard.title} onChange={e => handleCardChange('title', e.target.value)} required />
+                    <label style={labelStyle}>কার্ড শিরোনাম (বাংলা) *</label>
+                    <input style={inputStyle} value={editingCard.title} onChange={e => handleCardChange('title', e.target.value)} placeholder="যেমন: স্বাস্থ্য সেবা" required />
                   </div>
                   <div>
                     <label style={labelStyle}>বিবরণ</label>
-                    <input style={inputStyle} value={editingCard.description || ''} onChange={e => handleCardChange('description', e.target.value)} />
+                    <input style={inputStyle} value={editingCard.description || ''} onChange={e => handleCardChange('description', e.target.value)} placeholder="ছোট বিবরণ..." />
                   </div>
                   <div>
-                    <label style={labelStyle}>লিংক (Route)</label>
-                    <input style={inputStyle} value={editingCard.link || ''} onChange={e => handleCardChange('link', e.target.value)} placeholder="/agriculture" />
+                    <label style={labelStyle}>লিংক (Route) *</label>
+                    <input style={inputStyle} value={editingCard.link || ''} onChange={e => handleCardChange('link', e.target.value)} placeholder="/health বা /agriculture" required />
                   </div>
                   <div>
                     <label style={labelStyle}>ইমোজি আইকন (ডিফল্ট)</label>
@@ -377,7 +421,7 @@ export default function ContentAdminManager() {
 
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
                   <button type="submit" className="btn btn-primary" disabled={cardSaving}>
-                    <Save size={16} /> {cardSaving ? 'সংরক্ষণ হচ্ছে...' : 'কার্ড আপডেট করুন'}
+                    <Save size={16} /> {cardSaving ? 'সংরক্ষণ হচ্ছে...' : (editingCard.isNew ? 'কার্ড যোগ করুন' : 'কার্ড আপডেট করুন')}
                   </button>
                   <button type="button" className="btn btn-secondary" onClick={() => setEditingCard(null)}>বাতিল</button>
                 </div>
@@ -387,8 +431,18 @@ export default function ContentAdminManager() {
 
           {/* Cards Grid */}
           <div style={cardStyle}>
-            <div style={{ fontWeight: '700', marginBottom: '1rem', fontSize: '1rem' }}>
-              সার্ভিস কার্ডসমূহ ({cards.length}টি) — ক্লিক করে সম্পাদনা করুন
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ fontWeight: '700', fontSize: '1rem' }}>
+                সার্ভিস কার্ডসমূহ ({cards.length}টি) — ক্লিক করে সম্পাদনা করুন
+              </div>
+              <button
+                type="button"
+                onClick={handleAddNewCard}
+                className="btn btn-primary"
+                style={{ fontSize: '0.82rem', padding: '0.4rem 0.85rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+              >
+                <Plus size={15} /> নতুন সার্ভিস কার্ড যোগ
+              </button>
             </div>
             {cardsLoading ? (
               <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>লোড হচ্ছে...</div>
@@ -436,8 +490,11 @@ export default function ContentAdminManager() {
                       <button onClick={() => handleEditCard(card)} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.3rem 0.65rem', flex: 1 }}>
                         <Edit2 size={12} /> সম্পাদনা
                       </button>
-                      <button onClick={() => handleToggleCard(card)} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.3rem 0.65rem' }}>
+                      <button onClick={() => handleToggleCard(card)} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.3rem 0.65rem' }} title={card.isActive !== false ? 'লুকান' : 'সক্রিয় করুন'}>
                         {card.isActive !== false ? <EyeOff size={12} /> : <Eye size={12} />}
+                      </button>
+                      <button onClick={() => handleDeleteCard(card)} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.3rem 0.55rem', color: '#dc2626' }} title="মুছে ফেলুন">
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   </div>

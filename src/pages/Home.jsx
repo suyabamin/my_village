@@ -243,6 +243,28 @@ export const Home = () => {
     }
   ];
 
+  // Dynamic service cards with static layout fallback (preserves styles & icons, applies dynamic edits)
+  const displayServiceCards = useMemo(() => {
+    if (!dynamicServiceCards || dynamicServiceCards.length === 0) {
+      return serviceCards;
+    }
+
+    return dynamicServiceCards.map((dyn) => {
+      const staticMatch = serviceCards.find(sc => sc.link === dyn.link || sc.id === dyn.id) || {};
+      return {
+        id: dyn.id || staticMatch.id || `card-${Math.random()}`,
+        link: dyn.link || staticMatch.link || '/',
+        title: dyn.title || staticMatch.title || '',
+        subtitle: dyn.description || staticMatch.subtitle || '',
+        icon: staticMatch.icon,
+        iconEmoji: dyn.iconEmoji || '📌',
+        iconUrl: dyn.iconUrl || '',
+        image: dyn.bgImageUrl || staticMatch.image || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=400&q=80',
+        cls: staticMatch.cls || dyn.bgGradient || 'card-farming'
+      };
+    });
+  }, [dynamicServiceCards, serviceCards]);
+
   // Urgent Notices list from imported HTML
   const urgentNotices = [
     {
@@ -454,13 +476,8 @@ export const Home = () => {
           </div>
 
           <div className="services-grid">
-            {serviceCards.map((card) => {
+            {displayServiceCards.map((card) => {
               const Icon = card.icon;
-              // Overlay dynamic Firestore data (iconUrl, bgImageUrl, title) on top of static card
-              const dynCard = dynamicServiceCards.find(dc => dc.link === card.link) || {};
-              const iconUrl = dynCard.iconUrl || '';
-              const bgImage = dynCard.bgImageUrl || card.image;
-              const displayTitle = dynCard.title || card.title;
               return (
                 <Link 
                   key={card.id} 
@@ -469,24 +486,26 @@ export const Home = () => {
                 >
                   <div className="service-header">
                     <div className="service-icon">
-                      {iconUrl ? (
+                      {card.iconUrl ? (
                         <img
-                          src={iconUrl}
-                          alt={displayTitle}
+                          src={card.iconUrl}
+                          alt={card.title}
                           style={{ width: '22px', height: '22px', objectFit: 'contain', display: 'block' }}
                           onError={e => { e.target.style.display = 'none'; }}
                         />
-                      ) : (
+                      ) : Icon ? (
                         <Icon size={18} />
+                      ) : (
+                        <span style={{ fontSize: '18px', lineHeight: 1 }}>{card.iconEmoji || '📌'}</span>
                       )}
                     </div>
                     <div>
-                      <h4>{displayTitle}</h4>
+                      <h4>{card.title}</h4>
                       <p>{card.subtitle}</p>
                     </div>
                   </div>
                   <div className="service-img">
-                    <img src={bgImage} alt={displayTitle} loading="lazy" />
+                    <img src={card.image} alt={card.title} loading="lazy" />
                     <div className="service-arrow">
                       <ArrowRight size={12} />
                     </div>

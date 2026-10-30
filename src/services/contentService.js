@@ -210,6 +210,30 @@ export const updateSiteContent = async (updatedFields) => {
 
 // ─── 2. SERVICE CARDS CMS ───────────────────────────────────────────────────
 
+/**
+ * Generate a clean, stable document ID for a service card.
+ * Handles existing IDs, link-based slugs, or title-based slugs, preventing duplicates.
+ */
+export const generateStableCardId = (cardData) => {
+  if (cardData?.id && typeof cardData.id === 'string' && cardData.id.trim()) {
+    let id = cardData.id.trim();
+    if (id === 'card-sport') id = 'card-sports';
+    return id;
+  }
+  let slug = '';
+  if (cardData?.link && typeof cardData.link === 'string') {
+    slug = cardData.link.replace(/^\/+|\/+$/g, '').replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase();
+  }
+  if (!slug && cardData?.title && typeof cardData.title === 'string') {
+    slug = cardData.title.trim().toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '-');
+  }
+  if (!slug) {
+    slug = `${Date.now()}`;
+  }
+  const fullId = slug.startsWith('card-') ? slug : `card-${slug}`;
+  return fullId === 'card-sport' ? 'card-sports' : fullId;
+};
+
 export const fetchServiceCards = async (includeInactive = false) => {
   let list = [];
 
@@ -219,8 +243,6 @@ export const fetchServiceCards = async (includeInactive = false) => {
       const snap = await getDocs(q);
       if (!snap.empty) {
         list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        // Write fresh data to cache immediately so it's always up to date
-        try { localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(list)); } catch (_) {}
       }
     }
   } catch (err) {
@@ -234,6 +256,26 @@ export const fetchServiceCards = async (includeInactive = false) => {
     } catch (_) {
       list = DEFAULT_SERVICE_CARDS;
     }
+  } else {
+    // If Firestore has some cards, merge missing default cards to preserve all village services
+    const existingIds = new Set(list.map(c => c.id));
+    const existingLinks = new Set(list.map(c => c.link).filter(Boolean));
+
+    // Handle sport/sports alias so duplicate isn't added
+    if (existingIds.has('card-sport')) existingIds.add('card-sports');
+    if (existingIds.has('card-sports')) existingIds.add('card-sport');
+
+    const missingDefaults = DEFAULT_SERVICE_CARDS.filter(def => 
+      !existingIds.has(def.id) && 
+      !existingLinks.has(def.link)
+    );
+
+    if (missingDefaults.length > 0) {
+      list = [...list, ...missingDefaults];
+    }
+    list.sort((a, b) => (Number(a.displayOrder) || 0) - (Number(b.displayOrder) || 0));
+
+    try { localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(list)); } catch (_) {}
   }
 
   if (!includeInactive) {
@@ -243,33 +285,89 @@ export const fetchServiceCards = async (includeInactive = false) => {
 };
 
 export const updateServiceCard = async (cardId, updatedFields) => {
+  if (!cardId) {
+    throw new Error('কার্ড ID পাওয়া যায়নি।');
+  }
+
+  // Normalize ID (handle card-sport vs card-sports)
+  let effectiveId = cardId.trim();
+  if (effectiveId === 'card-sport') {
+    effectiveId = 'card-sports';
+  }
+
   const cleaned = {
     ...updatedFields,
+    id: effectiveId,
     displayOrder: Number(updatedFields.displayOrder || 1),
     isActive: updatedFields.isActive !== false,
     updatedAt: new Date().toISOString()
   };
+  delete cleaned.isNew;
 
-  // Throw on Firestore error so the caller's catch block fires (no false-success toast)
   if (isLiveFirebaseConfigured) {
-    const cardRef = doc(db, SERVICE_CARDS_COLLECTION, cardId);
-    await updateDoc(cardRef, {
-      ...cleaned,
-      updatedAt: serverTimestamp()
-    });
+    // 1. Check whether document actually exists in Firestore (Requirement 2)
+    let cardRef = doc(db, SERVICE_CARDS_COLLECTION, effectiveId);
+    let snap = await getDoc(cardRef);
+
+    // If not found under effectiveId, check if it was originally saved under old cardId (e.g. card-sport)
+    if (!snap.exists() && effectiveId !== cardId) {
+      const origRef = doc(db, SERVICE_CARDS_COLLECTION, cardId);
+      const origSnap = await getDoc(origRef);
+      if (origSnap.exists()) {
+        cardRef = origRef;
+        snap = origSnap;
+        effectiveId = cardId;
+      }
+    }
+
+    if (snap.exists()) {
+      // 2. Existing card: update safely with updateDoc() (Requirement 4)
+      await updateDoc(cardRef, {
+        ...cleaned,
+        updatedAt: serverTimestamp()
+      });
+    } else {
+      // 3. Document does not exist in Firestore yet:
+      // Construct complete document using defaults to avoid creating incomplete documents (Requirement 8)
+      const defaultCard = DEFAULT_SERVICE_CARDS.find(c => 
+        c.id === effectiveId || 
+        c.id === cardId || 
+        (c.link && updatedFields.link && c.link === updatedFields.link)
+      ) || {};
+
+      const fullDoc = {
+        title: cleaned.title || defaultCard.title || '',
+        description: cleaned.description !== undefined ? cleaned.description : (defaultCard.description || ''),
+        link: cleaned.link || defaultCard.link || '',
+        iconEmoji: cleaned.iconEmoji || defaultCard.iconEmoji || '📌',
+        iconUrl: cleaned.iconUrl !== undefined ? cleaned.iconUrl : (defaultCard.iconUrl || ''),
+        bgImageUrl: cleaned.bgImageUrl !== undefined ? cleaned.bgImageUrl : (defaultCard.bgImageUrl || ''),
+        bgGradient: cleaned.bgGradient || defaultCard.bgGradient || 'mob-card-1',
+        displayOrder: Number(cleaned.displayOrder || defaultCard.displayOrder || 1),
+        isActive: cleaned.isActive !== false,
+        ...defaultCard,
+        ...cleaned,
+        id: effectiveId,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      // Create new document safely using setDoc (Requirement 3)
+      await setDoc(cardRef, fullDoc, { merge: true });
+    }
   }
 
-  // Update localStorage cache by direct merge — do NOT re-fetch from Firestore
-  // (re-fetching risks a consistency race where the old document is still returned)
+  // Update local cache safely
   try {
     const raw = localStorage.getItem(SERVICE_CARDS_CACHE_KEY);
     const list = raw ? JSON.parse(raw) : [];
-    const idx = list.findIndex(c => c.id === cardId);
+    const idx = list.findIndex(c => c.id === effectiveId || c.id === cardId);
     if (idx >= 0) {
-      list[idx] = { ...list[idx], ...cleaned };
+      list[idx] = { ...list[idx], ...cleaned, id: effectiveId };
     } else {
-      list.push({ id: cardId, ...cleaned });
+      list.push({ id: effectiveId, ...cleaned });
     }
+    list.sort((a, b) => (Number(a.displayOrder) || 0) - (Number(b.displayOrder) || 0));
     localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(list));
   } catch (_) {}
 
@@ -278,32 +376,55 @@ export const updateServiceCard = async (cardId, updatedFields) => {
 };
 
 export const addServiceCard = async (cardData) => {
+  const cardId = generateStableCardId(cardData);
   const newCard = {
-    ...cardData,
+    title: cardData.title || '',
+    description: cardData.description || '',
+    link: cardData.link || '/',
+    iconEmoji: cardData.iconEmoji || '⭐',
+    iconUrl: cardData.iconUrl || '',
+    bgImageUrl: cardData.bgImageUrl || '',
+    bgGradient: cardData.bgGradient || 'mob-card-1',
     displayOrder: Number(cardData.displayOrder || 1),
     isActive: cardData.isActive !== false,
-    createdAt: new Date().toISOString()
+    ...cardData,
+    id: cardId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
+  delete newCard.isNew;
 
-  try {
-    if (isLiveFirebaseConfigured) {
-      const docRef = await addDoc(collection(db, SERVICE_CARDS_COLLECTION), {
+  if (isLiveFirebaseConfigured) {
+    const cardRef = doc(db, SERVICE_CARDS_COLLECTION, cardId);
+    const snap = await getDoc(cardRef);
+    if (snap.exists()) {
+      // Document already exists, update safely using updateDoc (Requirement 4)
+      await updateDoc(cardRef, {
+        ...newCard,
+        updatedAt: serverTimestamp()
+      });
+    } else {
+      // New card document, create using setDoc (Requirement 3)
+      await setDoc(cardRef, {
         ...newCard,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
-      });
-      newCard.id = docRef.id;
-    } else {
-      newCard.id = `card-${Date.now()}`;
+      }, { merge: true });
     }
-  } catch (err) {
-    newCard.id = `card-${Date.now()}`;
   }
 
+  // Update local cache without race condition
   try {
-    const cached = await fetchServiceCards(true);
-    const updated = [...cached, newCard].sort((a, b) => a.displayOrder - b.displayOrder);
-    localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(updated));
+    const raw = localStorage.getItem(SERVICE_CARDS_CACHE_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    const idx = list.findIndex(c => c.id === cardId);
+    if (idx >= 0) {
+      list[idx] = { ...list[idx], ...newCard };
+    } else {
+      list.push(newCard);
+    }
+    list.sort((a, b) => (Number(a.displayOrder) || 0) - (Number(b.displayOrder) || 0));
+    localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(list));
   } catch (_) {}
 
   notifyContentUpdate();
@@ -311,17 +432,25 @@ export const addServiceCard = async (cardData) => {
 };
 
 export const deleteServiceCard = async (cardId) => {
+  if (!cardId) return false;
+
   try {
     if (isLiveFirebaseConfigured) {
-      await deleteDoc(doc(db, SERVICE_CARDS_COLLECTION, cardId));
+      const cardRef = doc(db, SERVICE_CARDS_COLLECTION, cardId);
+      const snap = await getDoc(cardRef);
+      if (snap.exists()) {
+        await deleteDoc(cardRef);
+      }
     }
   } catch (err) {
     console.warn("Firestore deleteServiceCard error:", err);
+    throw err;
   }
 
   try {
-    const cached = await fetchServiceCards(true);
-    const updated = cached.filter(c => c.id !== cardId);
+    const raw = localStorage.getItem(SERVICE_CARDS_CACHE_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    const updated = list.filter(c => c.id !== cardId);
     localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(updated));
   } catch (_) {}
 

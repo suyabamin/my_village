@@ -87,13 +87,15 @@ export default function ContentAdminManager() {
     if (!file || !editingCard) return;
     setIconUploading(true);
     try {
-      const url = await uploadIconOrImage(file, true); // transparent PNG support
+      const url = await uploadIconOrImage(file, true, editingCard.id);
+      if (!url) throw new Error('URL পাওয়া যায়নি');
       handleCardChange('iconUrl', url);
       addToast('আইকন আপলোড সফল!', 'success');
     } catch (err) {
       addToast(`আইকন আপলোড ব্যর্থ: ${err.message}`, 'error');
     } finally {
       setIconUploading(false);
+      e.target.value = ''; // Reset so same file can be re-selected
     }
   };
 
@@ -102,13 +104,15 @@ export default function ContentAdminManager() {
     if (!file || !editingCard) return;
     setBgUploading(true);
     try {
-      const url = await uploadIconOrImage(file, false);
+      const url = await uploadIconOrImage(file, false, editingCard.id);
+      if (!url) throw new Error('URL পাওয়া যায়নি');
       handleCardChange('bgImageUrl', url);
       addToast('ব্যাকগ্রাউন্ড ছবি আপলোড সফল!', 'success');
     } catch (err) {
       addToast(`ব্যাকগ্রাউন্ড ছবি আপলোড ব্যর্থ: ${err.message}`, 'error');
     } finally {
       setBgUploading(false);
+      e.target.value = ''; // Reset so same file can be re-selected
     }
   };
 
@@ -119,7 +123,7 @@ export default function ContentAdminManager() {
     try {
       await updateServiceCard(editingCard.id, editingCard);
       setCards(prev => prev.map(c => c.id === editingCard.id ? { ...c, ...editingCard } : c));
-      addToast(`"${editingCard.title}" কার্ড আপডেট হয়েছে!`, 'success');
+      addToast(`"${editingCard.title}" কার্ড সফলভাবে আপডেট হয়েছে!`, 'success');
       setEditingCard(null);
     } catch (err) {
       addToast(`কার্ড সংরক্ষণে সমস্যা: ${err.message}`, 'error');

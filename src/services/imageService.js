@@ -3,9 +3,13 @@
  * 
  * 1. Compresses large photos (e.g. 5MB-10MB mobile phone photos) on the client side
  *    to lightweight WebP images (<100KB) using HTML5 Canvas.
- * 2. Uploads to free image APIs (ImgBB / Cloudinary) if configured, or returns 
+ * 2. Uploads to Firebase Storage (preferred) for permanent, reliable URLs.
+ * 3. Falls back to free image APIs (ImgBB) if Storage is unavailable, or returns 
  *    the compressed WebP Data URL so it requires 0 paid storage!
  */
+
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage, isLiveFirebaseConfigured } from '../config/firebase';
 
 // Client-side Image Compressor
 export const compressImage = (file, maxWidth = 1000, quality = 0.75) => {
@@ -92,4 +96,32 @@ export const uploadFreeImage = async (file) => {
 
   // 4. Fallback: Return client-side compressed WebP Data URL (100% free, zero backend needed!)
   return compressedBase64;
+};
+
+/**
+ * Upload image to Firebase Storage and return permanent download URL.
+ * Falls back to ImgBB then base64 data URL if Storage is unavailable.
+ */
+export const uploadToFirebaseStorage = async (file, path) => {
+  if (!file) return null;
+
+  try {
+    if (isLiveFirebaseConfigured) {
+      const storageRef = ref(storage, path);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+      return downloadUrl;
+    }
+  } catch (err) {
+    console.warn('Firebase Storage upload failed, trying ImgBB:', err);
+  }
+
+  // Fallback to ImgBB
+  try {
+    const imgbbUrl = await uploadToImgBB(file);
+    if (imgbbUrl) return imgbbUrl;
+  } catch (_) {}
+
+  // Final fallback: compressed base64
+  return compressImage(file, 800, 0.82);
 };

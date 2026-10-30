@@ -30,6 +30,7 @@ import { subscribeLiveMatches } from '../services/sportsService';
 import { fetchVillageWeather, toBengaliNumber } from '../services/weatherService';
 import { fetchActiveVillageImages } from '../services/villageCommonImageService';
 import { fetchVillageLocations } from '../services/villageMapService';
+import { fetchServiceCards } from '../services/contentService';
 import { VillageMap } from '../components/map/VillageMap';
 import { EditableText } from '../components/common/EditableText';
 import { MobileHomePage } from '../components/home/mobile/MobileHomePage';
@@ -44,6 +45,20 @@ export const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSliderPaused, setIsSliderPaused] = useState(false);
   const autoSlideTimerRef = useRef(null);
+  // Dynamic service cards from Firestore (iconUrl, bgImageUrl, title overrides)
+  const [dynamicServiceCards, setDynamicServiceCards] = useState([]);
+
+  // Load dynamic service cards from Firestore so admin changes reflect here
+  useEffect(() => {
+    const loadCards = () => {
+      fetchServiceCards(false).then(cards => {
+        if (cards && cards.length > 0) setDynamicServiceCards(cards);
+      }).catch(() => {});
+    };
+    loadCards();
+    window.addEventListener('site-content-updated', loadCards);
+    return () => window.removeEventListener('site-content-updated', loadCards);
+  }, []);
 
   // 1. Fetch site settings & map locations
   useEffect(() => {
@@ -441,6 +456,11 @@ export const Home = () => {
           <div className="services-grid">
             {serviceCards.map((card) => {
               const Icon = card.icon;
+              // Overlay dynamic Firestore data (iconUrl, bgImageUrl, title) on top of static card
+              const dynCard = dynamicServiceCards.find(dc => dc.link === card.link) || {};
+              const iconUrl = dynCard.iconUrl || '';
+              const bgImage = dynCard.bgImageUrl || card.image;
+              const displayTitle = dynCard.title || card.title;
               return (
                 <Link 
                   key={card.id} 
@@ -449,15 +469,24 @@ export const Home = () => {
                 >
                   <div className="service-header">
                     <div className="service-icon">
-                      <Icon size={18} />
+                      {iconUrl ? (
+                        <img
+                          src={iconUrl}
+                          alt={displayTitle}
+                          style={{ width: '22px', height: '22px', objectFit: 'contain', display: 'block' }}
+                          onError={e => { e.target.style.display = 'none'; }}
+                        />
+                      ) : (
+                        <Icon size={18} />
+                      )}
                     </div>
                     <div>
-                      <h4>{card.title}</h4>
+                      <h4>{displayTitle}</h4>
                       <p>{card.subtitle}</p>
                     </div>
                   </div>
                   <div className="service-img">
-                    <img src={card.image} alt={card.title} loading="lazy" />
+                    <img src={bgImage} alt={displayTitle} loading="lazy" />
                     <div className="service-arrow">
                       <ArrowRight size={12} />
                     </div>

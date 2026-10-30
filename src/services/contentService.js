@@ -19,7 +19,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { db, isLiveFirebaseConfigured } from '../config/firebase';
-import { compressImage, uploadFreeImage } from './imageService';
+import { uploadToFirebaseStorage } from './imageService';
 
 const SETTINGS_DOC_ID = 'general';
 const SERVICE_CARDS_COLLECTION = 'service_cards';
@@ -219,6 +219,8 @@ export const fetchServiceCards = async (includeInactive = false) => {
       const snap = await getDocs(q);
       if (!snap.empty) {
         list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Write fresh data to cache immediately so it's always up to date
+        try { localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(list)); } catch (_) {}
       }
     }
   } catch (err) {
@@ -248,22 +250,27 @@ export const updateServiceCard = async (cardId, updatedFields) => {
     updatedAt: new Date().toISOString()
   };
 
-  try {
-    if (isLiveFirebaseConfigured) {
-      const cardRef = doc(db, SERVICE_CARDS_COLLECTION, cardId);
-      await updateDoc(cardRef, {
-        ...cleaned,
-        updatedAt: serverTimestamp()
-      });
-    }
-  } catch (err) {
-    console.warn("Firestore updateServiceCard fallback:", err);
+  // Throw on Firestore error so the caller's catch block fires (no false-success toast)
+  if (isLiveFirebaseConfigured) {
+    const cardRef = doc(db, SERVICE_CARDS_COLLECTION, cardId);
+    await updateDoc(cardRef, {
+      ...cleaned,
+      updatedAt: serverTimestamp()
+    });
   }
 
+  // Update localStorage cache by direct merge — do NOT re-fetch from Firestore
+  // (re-fetching risks a consistency race where the old document is still returned)
   try {
-    const cached = await fetchServiceCards(true);
-    const updated = cached.map(c => c.id === cardId ? { ...c, ...cleaned } : c);
-    localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(updated));
+    const raw = localStorage.getItem(SERVICE_CARDS_CACHE_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    const idx = list.findIndex(c => c.id === cardId);
+    if (idx >= 0) {
+      list[idx] = { ...list[idx], ...cleaned };
+    } else {
+      list.push({ id: cardId, ...cleaned });
+    }
+    localStorage.setItem(SERVICE_CARDS_CACHE_KEY, JSON.stringify(list));
   } catch (_) {}
 
   notifyContentUpdate();
@@ -325,10 +332,15 @@ export const deleteServiceCard = async (cardId) => {
 // ─── 3. IMAGE & ICON UPLOAD HELPER ──────────────────────────────────────────
 
 /**
- * Upload an image or custom icon (PNG/JPG/WebP).
- * Compresses large photos while preserving transparent PNG for icons.
+ * Upload an image or custom icon to Firebase Storage.
+ * Returns a permanent HTTPS download URL.
+ * Falls back to ImgBB, then compressed base64 if Storage is unavailable.
+ *
+ * @param {File} file - The file to upload
+ * @param {boolean} isIcon - true for icons (uses icon subfolder), false for bg images
+ * @param {string} cardId - Card ID used to name the file in storage
  */
-export const uploadIconOrImage = async (file, isIcon = false) => {
+export const uploadIconOrImage = async (file, isIcon = false, cardId = 'general') => {
   if (!file) return null;
 
   // Validate format
@@ -342,28 +354,13 @@ export const uploadIconOrImage = async (file, isIcon = false) => {
     throw new Error('ছবির সাইজ সর্বোচ্চ ৫ মেগাবাইট (5MB) হতে পারবে।');
   }
 
-  // For transparent PNG icons, preserve transparency without quality loss
-  if (file.type === 'image/png' && isIcon) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = (e) => reject(e);
-      reader.readAsDataURL(file);
-    });
-  }
+  // Build Firebase Storage path
+  const ext = file.name.split('.').pop().toLowerCase() || 'png';
+  const folder = isIcon ? 'service_card_icons' : 'service_card_images';
+  const storagePath = `${folder}/${cardId}_${Date.now()}.${ext}`;
 
-  // For photos, compress to lightweight format
-  try {
-    const compressed = await compressImage(file, isIcon ? 200 : 1200, 0.85);
-    // Optionally upload to free image cloud if available
-    const remoteUrl = await uploadFreeImage(file);
-    return remoteUrl || compressed;
-  } catch (err) {
-    console.warn("Compression fallback:", err);
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.readAsDataURL(file);
-    });
-  }
+  // Upload to Firebase Storage → returns permanent HTTPS URL
+  const url = await uploadToFirebaseStorage(file, storagePath);
+  if (!url) throw new Error('ছবি আপলোড ব্যর্থ হয়েছে।');
+  return url;
 };

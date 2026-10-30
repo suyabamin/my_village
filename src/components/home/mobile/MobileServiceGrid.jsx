@@ -10,6 +10,7 @@ export const MobileServiceGrid = () => {
       title: c.title,
       icon: c.iconEmoji || '📌',
       iconUrl: c.iconUrl || '',
+      bgImageUrl: c.bgImageUrl || '',
       link: c.link,
       cardClass: c.bgGradient || `mob-card-${i + 1}`
     }))
@@ -26,6 +27,7 @@ export const MobileServiceGrid = () => {
               title: c.title,
               icon: c.iconEmoji || '📌',
               iconUrl: c.iconUrl || '',
+              bgImageUrl: c.bgImageUrl || '',
               link: c.link,
               cardClass: c.bgGradient || `mob-card-${i + 1}`
             }))
@@ -60,7 +62,14 @@ export const MobileServiceGrid = () => {
             key={item.id}
             to={item.link}
             className={`mobile-service-card ${item.cardClass}`}
-            style={{ animationDelay: `${index * 40}ms` }}
+            style={{
+              animationDelay: `${index * 40}ms`,
+              ...(item.bgImageUrl ? {
+                backgroundImage: `linear-gradient(rgba(0,0,0,0.32), rgba(0,0,0,0.18)), url(${item.bgImageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              } : {})
+            }}
             title={item.title}
           >
             <div className="mobile-service-icon" aria-hidden="true">

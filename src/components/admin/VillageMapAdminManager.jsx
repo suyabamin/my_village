@@ -321,9 +321,16 @@ export default function VillageMapAdminManager() {
             style={{ width: '100%', height: '100%' }}
           >
             <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP"
               subdomains="abc"
+              maxZoom={19}
+            />
+            <TileLayer
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png"
+              attribution=""
+              subdomains="abcd"
+              maxZoom={19}
             />
             <MapClickHandler onMapClick={handleMapClick} enabled={clickToPin} />
 

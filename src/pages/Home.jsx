@@ -28,6 +28,7 @@ import { getCollectionData, initialVillageData } from '../services/dbService';
 import { subscribeLiveMatches } from '../services/sportsService';
 import { fetchVillageWeather, toBengaliNumber } from '../services/weatherService';
 import { fetchActiveVillageImages } from '../services/villageCommonImageService';
+import { fetchVillageLocations } from '../services/villageMapService';
 import { VillageMap } from '../components/map/VillageMap';
 import { EditableText } from '../components/common/EditableText';
 import { MobileHomePage } from '../components/home/mobile/MobileHomePage';
@@ -49,15 +50,23 @@ export const Home = () => {
       if (res && res.length > 0) setSiteSettings(res[0]);
     }).catch(() => {});
 
-    getCollectionData('map_locations').then(res => {
-      if (res && res.length > 0) setMapLocations(res);
-    }).catch(() => {});
+    const loadLocations = () => {
+      fetchVillageLocations(false).then(res => {
+        if (res && res.length > 0) setMapLocations(res);
+      }).catch(() => {});
+    };
+
+    loadLocations();
+    window.addEventListener('village-map-updated', loadLocations);
 
     const unSubMatches = subscribeLiveMatches((list) => {
       setLiveMatches(list || []);
     });
 
-    return () => unSubMatches();
+    return () => {
+      unSubMatches();
+      window.removeEventListener('village-map-updated', loadLocations);
+    };
   }, []);
 
   // 2. Load weather data from isolated village weather service

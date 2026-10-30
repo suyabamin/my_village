@@ -241,20 +241,8 @@ const createClusterIcon = (count) => {
   });
 };
 
-// Approved Tile Providers
+// Approved Tile Providers (Only Satellite)
 const tileProviders = {
-  osm: {
-    name: 'স্ট্যান্ডার্ড রোড ম্যাপ (OpenStreetMap)',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    subdomains: 'abc'
-  },
-  street: {
-    name: 'ভয়েজার (Carto)',
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
-    subdomains: 'abcd'
-  },
   satellite: {
     name: 'স্যাটেলাইট (Satellite)',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -326,7 +314,7 @@ export const VillageMap = ({
   const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
   const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM);
   const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM);
-  const [activeTileKey, setActiveTileKey] = useState('osm');
+  const [activeTileKey, setActiveTileKey] = useState('satellite');
   const [activeLocationId, setActiveLocationId] = useState(null);
   
   // Controls & Overlay States
@@ -416,7 +404,7 @@ export const VillageMap = ({
     return locations.filter(l => l.category === catKey).length;
   };
 
-  const activeTile = tileProviders[activeTileKey] || tileProviders.osm;
+  const activeTile = tileProviders.satellite;
 
   return (
     <div 
@@ -597,22 +585,23 @@ export const VillageMap = ({
             onZoomChange={(z) => setCurrentZoom(z)} 
           />
 
-          {/* Active Map Tile Layer */}
+          {/* Satellite Map Tile Layer (Primary) */}
           <TileLayer
-            key={activeTileKey}
+            key="satellite-base"
             url={activeTile.url}
             attribution={activeTile.attribution}
             subdomains={activeTile.subdomains || 'abc'}
             maxZoom={19}
           />
 
-          {/* Satellite View Reference Labels Overlay */}
-          {activeTileKey === 'satellite' && (
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png"
-              attribution=""
-            />
-          )}
+          {/* Reference Place & Road Labels Overlay on Satellite */}
+          <TileLayer
+            key="satellite-labels"
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png"
+            attribution=""
+            subdomains="abcd"
+            maxZoom={19}
+          />
 
           {/* Agricultural Field Vector Polygons */}
           {showAgriFields && AGRI_POLYGONS.map(field => (
@@ -799,199 +788,204 @@ export const VillageMap = ({
           })}
         </MapContainer>
 
-        {/* ─── FLOATING MAP ACTION CONTROLS (Google Maps Style) ─── */}
+        {/* ─── FLOATING MAP ACTION CONTROLS ─── */}
         
-        {/* Map Layer Style Control */}
-        <div style={styles.layerControlWrapper}>
-          <button 
-            onClick={() => setShowLayerMenu(!showLayerMenu)} 
-            style={{
-              ...styles.floatingControlBtn,
-              backgroundColor: showLayerMenu ? '#16a34a' : 'rgba(255, 255, 255, 0.95)',
-              color: showLayerMenu ? '#ffffff' : '#0f172a'
-            }}
-            title="ম্যাপ ভিউ পরিবর্তন করুন"
-          >
-            <Layers size={18} />
-          </button>
-
-          {showLayerMenu && (
-            <div style={styles.layerMenuDropdown}>
-              <div style={styles.layerMenuTitle}>ম্যাপ স্টাইল নির্বাচন:</div>
-              {Object.entries(tileProviders).map(([key, provider]) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setActiveTileKey(key);
-                    setShowLayerMenu(false);
-                  }}
-                  style={{
-                    ...styles.layerOptionBtn,
-                    backgroundColor: activeTileKey === key ? '#dcfce7' : 'transparent',
-                    color: activeTileKey === key ? '#15803d' : 'var(--text-main, #334155)',
-                    fontWeight: activeTileKey === key ? '700' : '500'
-                  }}
-                >
-                  <span>{provider.name}</span>
-                  {activeTileKey === key && <Check size={14} color="#15803d" />}
-                </button>
-              ))}
-
-              <div style={{ borderTop: '1px solid var(--border-color, #e2e8f0)', marginTop: '6px', paddingTop: '6px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', cursor: 'pointer', userSelect: 'none' }}>
-                  <input
-                    type="checkbox"
-                    checked={showAgriFields}
-                    onChange={(e) => setShowAgriFields(e.target.checked)}
-                  />
-                  <span>কৃষি মাঠ সীমানা দেখান</span>
-                </label>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons Right Column */}
-        <div style={styles.actionControlsCol}>
-          {/* Zoom In */}
-          <button 
-            onClick={handleZoomIn} 
-            style={styles.floatingControlBtn}
-            title="জুম ইন (+)"
-          >
-            <Plus size={18} />
-          </button>
-
-          {/* Zoom Out */}
-          <button 
-            onClick={handleZoomOut} 
-            style={styles.floatingControlBtn}
-            title="জুম আউট (-)"
-          >
-            <Minus size={18} />
-          </button>
-
-          {/* Compass Orientation */}
-          <button 
-            onClick={handleResetView} 
-            style={styles.floatingControlBtn}
-            title="উত্তর দিক ঠিক করুন / কম্পাস"
-          >
-            <Compass size={18} color="#2563eb" />
-          </button>
-
-          {/* Geolocation Locate Me */}
-          <button 
-            onClick={handleLocateUser} 
-            disabled={locatingUser}
-            style={styles.floatingControlBtn}
-            title="আমার বর্তমান অবস্থান"
-          >
-            <Locate size={18} color={locatingUser ? '#16a34a' : '#1e293b'} />
-          </button>
-
-          {/* Alamdipara Village View Reset */}
-          <button 
-            onClick={handleResetView} 
-            style={{
-              ...styles.floatingControlBtn,
-              width: 'auto',
-              padding: '0 10px',
-              gap: '4px',
-              fontSize: '0.78rem',
-              fontWeight: '700',
-              color: '#15803d'
-            }}
-            title="আলমদীপাড়া ভিউতে ফিরে যান"
-          >
-            <Home size={15} />
-            <span style={{ display: 'inline' }}>আলমদীপাড়া</span>
-          </button>
-
-          {/* Fullscreen Viewport Toggle */}
-          <button 
-            onClick={toggleFullscreen} 
-            style={styles.floatingControlBtn}
-            title={isFullscreen ? 'ছোট করুন' : 'ফুলস্ক্রিন ম্যাপ'}
-          >
-            {isFullscreen ? <Minimize2 size={17} /> : <Maximize2 size={17} />}
-          </button>
-        </div>
-
-        {/* Map Legend Overlay Button & Box */}
-        <div style={styles.legendWrapper}>
-          <button 
-            onClick={() => setShowLegend(!showLegend)}
-            style={{
-              ...styles.legendToggleBtn,
-              backgroundColor: showLegend ? '#15803d' : 'rgba(255, 255, 255, 0.95)',
-              color: showLegend ? '#ffffff' : '#0f172a'
-            }}
-          >
-            <Info size={14} />
-            <span>ম্যাপ নির্দেশিকা</span>
-          </button>
-
-          {showLegend && (
-            <div style={styles.legendBox}>
-              <div style={styles.legendTitle}>স্থানসমূহের ক্যাটাগরি কালার:</div>
-              <div style={styles.legendGrid}>
-                {Object.entries(categoryConfig).map(([catKey, cfg]) => (
-                  <div key={catKey} style={styles.legendItem}>
-                    <span style={{ ...styles.legendDot, backgroundColor: cfg.color }}></span>
-                    <span>{cfg.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-      </div>
-
-      {/* ─── BOTTOM LIST GRID OF VILLAGE LOCATIONS ─── */}
-      <div style={styles.cardsGrid}>
-        {filteredLocations.map(loc => {
-          const cfg = categoryConfig[loc.category] || categoryConfig.other;
-          const isSelected = activeLocationId === loc.id;
-
-          return (
-            <div 
-              key={loc.id}
-              onClick={() => {
-                setMapCenter([loc.lat, loc.lng]);
-                setZoomLevel(17);
-                setActiveLocationId(loc.id);
-              }}
+        {/* Compact Mode Sleek Floating Controls (Mobile Friendly) */}
+        {compact ? (
+          <div style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            zIndex: 1000
+          }}>
+            <button 
+              onClick={toggleFullscreen} 
               style={{
-                ...styles.locationCard,
-                borderColor: isSelected ? cfg.color : 'var(--border-color, #e2e8f0)',
-                backgroundColor: isSelected ? 'var(--bg-elevated, #f8fafc)' : 'var(--card-bg, #ffffff)',
-                transform: isSelected ? 'translateY(-2px)' : 'none'
+                ...styles.floatingControlBtn,
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px'
+              }}
+              title="ফুলস্ক্রিন ম্যাপ"
+            >
+              {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+            </button>
+            <button 
+              onClick={handleLocateUser} 
+              disabled={locatingUser}
+              style={{
+                ...styles.floatingControlBtn,
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px'
+              }}
+              title="আমার বর্তমান অবস্থান"
+            >
+              <Locate size={16} color={locatingUser ? '#16a34a' : '#1e293b'} />
+            </button>
+            <button 
+              onClick={handleResetView} 
+              style={{
+                ...styles.floatingControlBtn,
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px'
+              }}
+              title="আলমদীপাড়া ভিউ"
+            >
+              <Home size={15} color="#15803d" />
+            </button>
+          </div>
+        ) : (
+          /* Desktop / Full Page Action Controls */
+          <div style={styles.actionControlsCol}>
+            {/* Zoom In */}
+            <button 
+              onClick={handleZoomIn} 
+              style={styles.floatingControlBtn}
+              title="জুম ইন (+)"
+            >
+              <Plus size={18} />
+            </button>
+
+            {/* Zoom Out */}
+            <button 
+              onClick={handleZoomOut} 
+              style={styles.floatingControlBtn}
+              title="জুম আউট (-)"
+            >
+              <Minus size={18} />
+            </button>
+
+            {/* Compass Orientation */}
+            <button 
+              onClick={handleResetView} 
+              style={styles.floatingControlBtn}
+              title="উত্তর দিক ঠিক করুন / কম্পাস"
+            >
+              <Compass size={18} color="#2563eb" />
+            </button>
+
+            {/* Geolocation Locate Me */}
+            <button 
+              onClick={handleLocateUser} 
+              disabled={locatingUser}
+              style={styles.floatingControlBtn}
+              title="আমার বর্তমান অবস্থান"
+            >
+              <Locate size={18} color={locatingUser ? '#16a34a' : '#1e293b'} />
+            </button>
+
+            {/* Alamdipara Village View Reset */}
+            <button 
+              onClick={handleResetView} 
+              style={{
+                ...styles.floatingControlBtn,
+                width: 'auto',
+                padding: '0 10px',
+                gap: '4px',
+                fontSize: '0.78rem',
+                fontWeight: '700',
+                color: '#15803d'
+              }}
+              title="আলমদীপাড়া ভিউতে ফিরে যান"
+            >
+              <Home size={15} />
+              <span style={{ display: 'inline' }}>আলমদীপাড়া</span>
+            </button>
+
+            {/* Fullscreen Viewport Toggle */}
+            <button 
+              onClick={toggleFullscreen} 
+              style={styles.floatingControlBtn}
+              title={isFullscreen ? 'ছোট করুন' : 'ফুলস্ক্রিন ম্যাপ'}
+            >
+              {isFullscreen ? <Minimize2 size={17} /> : <Maximize2 size={17} />}
+            </button>
+          </div>
+        )}
+
+        {/* Map Legend Overlay Button & Box (Full Map Only) */}
+        {!compact && (
+          <div style={styles.legendWrapper}>
+            <button 
+              onClick={() => setShowLegend(!showLegend)}
+              style={{
+                ...styles.legendToggleBtn,
+                backgroundColor: showLegend ? '#15803d' : 'rgba(255, 255, 255, 0.95)',
+                color: showLegend ? '#ffffff' : '#0f172a'
               }}
             >
-              {loc.image ? (
-                <img src={loc.image} alt={loc.name} style={styles.cardImg} loading="lazy" />
-              ) : (
-                <div style={{ ...styles.cardIconBox, backgroundColor: cfg.bgLight, color: cfg.color }}>
-                  <MapPin size={22} />
-                </div>
-              )}
-              
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={styles.cardTitle}>{loc.name}</div>
-                <div style={styles.cardCatBadge}>
-                  <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: cfg.color, marginRight: '6px' }}></span>
-                  {cfg.label}
-                </div>
-                <div style={{ ...styles.cardActionText, color: cfg.color }}>
-                  ম্যাপে দেখুন →
+              <Info size={14} />
+              <span>ম্যাপ নির্দেশিকা</span>
+            </button>
+
+            {showLegend && (
+              <div style={styles.legendBox}>
+                <div style={styles.legendTitle}>স্থানসমূহের ক্যাটাগরি কালার:</div>
+                <div style={styles.legendGrid}>
+                  {Object.entries(categoryConfig).map(([catKey, cfg]) => (
+                    <div key={catKey} style={styles.legendItem}>
+                      <span style={{ ...styles.legendDot, backgroundColor: cfg.color }}></span>
+                      <span>{cfg.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          );
-        })}
+            )}
+          </div>
+        )}
+
       </div>
+
+      {/* ─── BOTTOM LIST GRID OF VILLAGE LOCATIONS (Full Map Only) ─── */}
+      {!compact && (
+        <div style={styles.cardsGrid}>
+          {filteredLocations.map(loc => {
+            const cfg = categoryConfig[loc.category] || categoryConfig.other;
+            const isSelected = activeLocationId === loc.id;
+
+            return (
+              <div 
+                key={loc.id}
+                onClick={() => {
+                  setMapCenter([loc.lat, loc.lng]);
+                  setZoomLevel(17);
+                  setActiveLocationId(loc.id);
+                }}
+                style={{
+                  ...styles.locationCard,
+                  borderColor: isSelected ? cfg.color : 'var(--border-color, #e2e8f0)',
+                  backgroundColor: isSelected ? 'var(--bg-elevated, #f8fafc)' : 'var(--card-bg, #ffffff)',
+                  transform: isSelected ? 'translateY(-2px)' : 'none'
+                }}
+              >
+                {loc.image ? (
+                  <img src={loc.image} alt={loc.name} style={styles.cardImg} loading="lazy" />
+                ) : (
+                  <div style={{ ...styles.cardIconBox, backgroundColor: cfg.bgLight, color: cfg.color }}>
+                    <MapPin size={22} />
+                  </div>
+                )}
+                
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={styles.cardTitle}>{loc.name}</div>
+                  <div style={styles.cardCatBadge}>
+                    <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: cfg.color, marginRight: '6px' }}></span>
+                    {cfg.label}
+                  </div>
+                  <div style={{ ...styles.cardActionText, color: cfg.color }}>
+                    ম্যাপে দেখুন →
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

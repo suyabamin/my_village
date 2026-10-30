@@ -10,9 +10,8 @@ export const MobileServiceGrid = () => {
       title: c.title,
       icon: c.iconEmoji || '📌',
       iconUrl: c.iconUrl || '',
-      bgImageUrl: c.bgImageUrl || '',
       link: c.link,
-      cardClass: c.bgGradient || `mob-card-${i + 1}`
+      cardClass: `mob-card-${i + 1}`
     }))
   );
 
@@ -27,9 +26,8 @@ export const MobileServiceGrid = () => {
               title: c.title,
               icon: c.iconEmoji || '📌',
               iconUrl: c.iconUrl || '',
-              bgImageUrl: c.bgImageUrl || '',
               link: c.link,
-              cardClass: c.bgGradient || `mob-card-${i + 1}`
+              cardClass: `mob-card-${i + 1}`
             }))
           );
         }
@@ -64,11 +62,8 @@ export const MobileServiceGrid = () => {
             className={`mobile-service-card ${item.cardClass}`}
             style={{
               animationDelay: `${index * 40}ms`,
-              ...(item.bgImageUrl ? {
-                backgroundImage: `linear-gradient(rgba(0,0,0,0.32), rgba(0,0,0,0.18)), url(${item.bgImageUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              } : {})
+              background: '#ffffff',
+              backgroundColor: '#ffffff'
             }}
             title={item.title}
           >

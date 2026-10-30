@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { VillageMap } from '../components/map/VillageMap';
-import { getCollectionData, initialVillageData } from '../services/dbService';
+import { fetchVillageLocations } from '../services/villageMapService';
 
 export const MapPage = () => {
-  const [locations, setLocations] = useState(initialVillageData.map_locations);
+  const [locations, setLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadLocations = async () => {
+    try {
+      const data = await fetchVillageLocations(false);
+      setLocations(data || []);
+    } catch (err) {
+      console.warn('MapPage location load error:', err);
+      setLocations([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    getCollectionData('map_locations').then(res => {
-      if (res && res.length > 0) setLocations(res);
-    });
+    loadLocations();
+    // Listen for admin map updates
+    const handler = () => loadLocations();
+    window.addEventListener('village-map-updated', handler);
+    return () => window.removeEventListener('village-map-updated', handler);
   }, []);
 
   return (
@@ -22,7 +37,13 @@ export const MapPage = () => {
         </p>
       </div>
 
-      <VillageMap locations={locations} />
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+          মানচিত্র লোড হচ্ছে...
+        </div>
+      ) : (
+        <VillageMap locations={locations} />
+      )}
     </div>
   );
 };

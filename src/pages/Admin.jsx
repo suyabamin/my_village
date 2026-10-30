@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { Shield, Users, Settings, FileText, CheckCircle2, Loader2, UserCheck, Image as ImageIcon, Trophy, Check, X } from 'lucide-react';
+import { Shield, Users, Settings, FileText, CheckCircle2, Loader2, UserCheck, Image as ImageIcon, Trophy, Check, X, MapPin, Layout } from 'lucide-react';
 import { getCollectionData, updateDocument, initialVillageData } from '../services/dbService';
 import { getTournaments, updateTournamentStatus } from '../services/sportsService';
 import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import VillageImageAdminManager from '../components/village/VillageImageAdminManager';
+import VillageMapAdminManager from '../components/admin/VillageMapAdminManager';
+import ContentAdminManager from '../components/admin/ContentAdminManager';
 
 export const Admin = () => {
   const { isSuperAdmin, currentUser, userProfile } = useAuth();
   const { addToast } = useNotification();
 
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roles' | 'tournaments' | 'settings' | 'village_images' | 'audit'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roles' | 'tournaments' | 'settings' | 'village_images' | 'map_management' | 'content_management' | 'audit'
 
   // Configurable Site Settings
   const [siteSettings, setSiteSettings] = useState(initialVillageData.site_settings);
@@ -197,6 +199,16 @@ export const Admin = () => {
         <button onClick={() => setActiveTab('audit')} className={`btn ${activeTab === 'audit' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
           <FileText size={18} /> অডিট লগ
         </button>
+        {isSuperAdmin && (
+          <button onClick={() => setActiveTab('map_management')} className={`btn ${activeTab === 'map_management' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+            🗺️ গ্রাম মানচিত্র
+          </button>
+        )}
+        {isSuperAdmin && (
+          <button onClick={() => setActiveTab('content_management')} className={`btn ${activeTab === 'content_management' ? 'btn-primary' : 'btn-secondary'}`} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+            📝 ওয়েবসাইট কন্টেন্ট
+          </button>
+        )}
       </div>
 
       {/* Tab 1: Overview */}
@@ -411,6 +423,16 @@ export const Admin = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Tab: Village Map Management */}
+      {activeTab === 'map_management' && isSuperAdmin && (
+        <VillageMapAdminManager />
+      )}
+
+      {/* Tab: Website Content Management */}
+      {activeTab === 'content_management' && isSuperAdmin && (
+        <ContentAdminManager />
       )}
 
     </div>

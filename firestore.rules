@@ -54,6 +54,12 @@ service cloud.firestore {
       allow write: if isSuperAdmin();
     }
     
+    // ─── Service Cards (CMS — dynamic homepage service cards) ────────────────
+    match /service_cards/{cardId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    
     // ─── Village Common Images ───────────────────────────────────────────────
     match /village_common_images/{imageId} {
       allow read: if true;

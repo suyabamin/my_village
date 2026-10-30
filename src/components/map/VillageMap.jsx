@@ -81,11 +81,11 @@ export const categoryConfig = {
     bgLight: '#dbeafe',
     iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`
   },
-  agriculture: {
-    label: 'কৃষি মাঠ',
-    color: '#15803d',
-    bgLight: '#f0fdf4',
-    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M10 20c0-3 1.5-5 5-6"/><path d="M12 20c0-6 3-9 7-10"/><path d="M12 20c0-8-5-11-9-12"/></svg>`
+  government: {
+    label: 'সরকারি প্রতিষ্ঠান',
+    color: '#0284c7',
+    bgLight: '#e0f2fe',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M6 18v-7"/><path d="M10 18v-7"/><path d="M14 18v-7"/><path d="M18 18v-7"/><path d="M12 3l10 5H2l10-5z"/></svg>`
   },
   sports: {
     label: 'খেলার মাঠ',
@@ -93,20 +93,44 @@ export const categoryConfig = {
     bgLight: '#fef3c7',
     iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>`
   },
+  agriculture: {
+    label: 'কৃষিজমি ও মাঠ',
+    color: '#15803d',
+    bgLight: '#f0fdf4',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M10 20c0-3 1.5-5 5-6"/><path d="M12 20c0-6 3-9 7-10"/><path d="M12 20c0-8-5-11-9-12"/></svg>`
+  },
+  landmark: {
+    label: 'গুরুত্বপূর্ণ স্থান',
+    color: '#dc2626',
+    bgLight: '#fee2e2',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
+  },
   organization: {
-    label: 'সংগঠন',
+    label: 'যুব সংঘ ও ক্লাব',
     color: '#7c3aed',
     bgLight: '#f3e8ff',
     iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`
   },
-  emergency: {
-    label: 'জরুরি স্থান',
-    color: '#dc2626',
-    bgLight: '#fee2e2',
-    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>`
+  market: {
+    label: 'বাজার ও দোকান',
+    color: '#ea580c',
+    bgLight: '#ffedd5',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`
+  },
+  road: {
+    label: 'রাস্তা ও সংযোগস্থল',
+    color: '#475569',
+    bgLight: '#f1f5f9',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="7"/><line x1="12" y1="11" x2="12" y2="15"/><line x1="12" y1="19" x2="12" y2="21"/></svg>`
+  },
+  health: {
+    label: 'স্বাস্থ্যসেবা',
+    color: '#e11d48',
+    bgLight: '#ffe4e6',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`
   },
   other: {
-    label: 'গুরুত্বপূর্ণ স্থান',
+    label: 'অন্যান্য স্থান',
     color: '#0f172a',
     bgLight: '#f1f5f9',
     iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>`
@@ -114,10 +138,12 @@ export const categoryConfig = {
 };
 
 // Create Google Maps style SVG pin marker
-const createCustomMarkerIcon = (category, isSelected = false, showLabel = false, locationName = '') => {
+const createCustomMarkerIcon = (category, isSelected = false, showLabel = false, locationName = '', customMarkerIcon = null) => {
   const config = categoryConfig[category] || categoryConfig.other;
   const color = config.color;
-  const iconSvg = config.iconSvg;
+  const iconContent = customMarkerIcon 
+    ? `<img src="${customMarkerIcon}" alt="${locationName}" style="width: 20px; height: 20px; object-fit: contain; border-radius: 4px;" />`
+    : config.iconSvg;
   const size = isSelected ? 44 : 36;
   const borderSize = isSelected ? 3 : 2;
 
@@ -175,7 +201,7 @@ const createCustomMarkerIcon = (category, isSelected = false, showLabel = false,
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         ">
           <div style="transform: rotate(45deg); display: flex; align-items: center; justify-content: center; color: #ffffff;">
-            ${iconSvg}
+            ${iconContent}
           </div>
         </div>
         ${labelHtml}
@@ -183,7 +209,7 @@ const createCustomMarkerIcon = (category, isSelected = false, showLabel = false,
     `,
     iconSize: [size, size],
     iconAnchor: [size / 2, size],
-    popupAnchor: [0, -size - 4]
+    popupAnchor: [0, -size + 4]
   });
 };
 
@@ -217,8 +243,14 @@ const createClusterIcon = (count) => {
 
 // Approved Tile Providers
 const tileProviders = {
+  osm: {
+    name: 'স্ট্যান্ডার্ড রোড ম্যাপ (OpenStreetMap)',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abc'
+  },
   street: {
-    name: 'স্ট্রিট ম্যাপ (Voyager)',
+    name: 'ভয়েজার (Carto)',
     url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
     subdomains: 'abcd'
@@ -227,12 +259,6 @@ const tileProviders = {
     name: 'স্যাটেলাইট (Satellite)',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
-    subdomains: 'abc'
-  },
-  osm: {
-    name: 'স্ট্যান্ডার্ড (OSM)',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     subdomains: 'abc'
   }
 };
@@ -300,7 +326,7 @@ export const VillageMap = ({
   const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
   const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM);
   const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM);
-  const [activeTileKey, setActiveTileKey] = useState('street');
+  const [activeTileKey, setActiveTileKey] = useState('osm');
   const [activeLocationId, setActiveLocationId] = useState(null);
   
   // Controls & Overlay States
@@ -390,7 +416,7 @@ export const VillageMap = ({
     return locations.filter(l => l.category === catKey).length;
   };
 
-  const activeTile = tileProviders[activeTileKey] || tileProviders.street;
+  const activeTile = tileProviders[activeTileKey] || tileProviders.osm;
 
   return (
     <div 

@@ -1,45 +1,86 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, MapPin, Sprout, Trophy, ShieldAlert } from 'lucide-react';
+import { Home, MapPin, Calendar, Bell, User } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 
 export const MobileBottomBar = () => {
   const location = useLocation();
+  const { currentUser } = useAuth();
+  const { unreadCount } = useNotification();
 
   const items = [
-    { label: 'হোম', path: '/', icon: Home },
-    { label: 'মানচিত্র', path: '/map', icon: MapPin },
-    { label: 'কৃষি', path: '/agriculture', icon: Sprout },
-    { label: 'খেলাধুলা', path: '/sports', icon: Trophy },
-    { label: 'জরুরি', path: '/emergency', icon: ShieldAlert },
+    { 
+      label: 'হোম', 
+      path: '/', 
+      icon: Home,
+      isActive: location.pathname === '/'
+    },
+    { 
+      label: 'ম্যাপ', 
+      path: '/map', 
+      icon: MapPin,
+      isActive: location.pathname.startsWith('/map')
+    },
+    { 
+      label: 'ইভেন্ট', 
+      path: '/sports', 
+      icon: Calendar,
+      isActive: location.pathname.startsWith('/sports') || 
+                location.pathname.startsWith('/tournament') || 
+                location.pathname.startsWith('/match')
+    },
+    { 
+      label: 'নোটিফিকেশন', 
+      path: '/emergency', 
+      icon: Bell,
+      badge: unreadCount,
+      isActive: location.pathname.startsWith('/emergency')
+    },
+    { 
+      label: 'প্রোফাইল', 
+      path: currentUser ? '/profile' : '/login', 
+      icon: User,
+      isActive: location.pathname.startsWith('/profile') || 
+                location.pathname.startsWith('/dashboard') || 
+                location.pathname.startsWith('/login')
+    },
   ];
 
   return (
     <nav
-      className="mobile-bottom-bar"
+      className="mobile-bottom-nav"
       aria-label="মোবাইল বটম নেভিগেশন"
       role="navigation"
     >
-      {items.map(item => {
+      {items.map((item) => {
         const Icon = item.icon;
-        const isActive = location.pathname === item.path ||
-          (item.path !== '/' && location.pathname.startsWith(item.path));
+        const isActive = item.isActive;
+
         return (
           <Link
-            key={item.path}
+            key={item.label}
             to={item.path}
-            className={`mobile-bottom-item${isActive ? ' active' : ''}`}
+            className={`mobile-nav-item ${isActive ? 'active' : ''}`}
             aria-label={item.label}
             aria-current={isActive ? 'page' : undefined}
           >
             <Icon
-              size={22}
-              color={isActive ? 'var(--color-primary-600)' : 'var(--text-muted)'}
-              aria-hidden="true"
+              size={20}
+              strokeWidth={isActive ? 2.5 : 2}
             />
-            <span style={{ lineHeight: 1.2 }}>{item.label}</span>
+            <span>{item.label}</span>
+            {item.badge > 0 && (
+              <span className="mobile-nav-badge" aria-label={`${item.badge}টি নোটিফিকেশন`}>
+                {item.badge}
+              </span>
+            )}
+            {isActive && <span className="mobile-nav-indicator" />}
           </Link>
         );
       })}
     </nav>
   );
 };
+
+export default MobileBottomBar;

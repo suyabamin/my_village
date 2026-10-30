@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { 
   Sprout, 
   Trophy, 
@@ -30,8 +30,10 @@ import { fetchVillageWeather, toBengaliNumber } from '../services/weatherService
 import { fetchActiveVillageImages } from '../services/villageCommonImageService';
 import { VillageMap } from '../components/map/VillageMap';
 import { EditableText } from '../components/common/EditableText';
+import { MobileHomePage } from '../components/home/mobile/MobileHomePage';
 
 export const Home = () => {
+  const { onOpenMobileNav } = useOutletContext() || {};
   const [siteSettings, setSiteSettings] = useState(initialVillageData.site_settings);
   const [mapLocations, setMapLocations] = useState(initialVillageData.map_locations);
   const [liveMatches, setLiveMatches] = useState([]);
@@ -310,7 +312,24 @@ export const Home = () => {
   const activeSlideImage = sliderImages[currentSlide] || sliderImages[0];
 
   return (
-    <div className="dashboard-content">
+    <>
+      {/* ── 1. HIGH-POLISH ANIMATED MOBILE HOMEPAGE (Max-width: 767px) ── */}
+      <div className="mobile-home-view">
+        <MobileHomePage 
+          onOpenMobileNav={onOpenMobileNav}
+          sliderImages={sliderImages}
+          siteSettings={siteSettings}
+          mapLocations={mapLocations}
+          liveMatches={liveMatches}
+          upcomingEvents={upcomingEvents}
+          urgentNotices={urgentNotices}
+          weatherData={weatherData}
+        />
+      </div>
+
+      {/* ── 2. PRESERVED ORIGINAL DESKTOP & TABLET HOMEPAGE (Min-width: 768px) ── */}
+      <div className="desktop-home-view">
+        <div className="dashboard-content">
       
       {/* LEFT COLUMN */}
       <div className="left-col">
@@ -581,5 +600,7 @@ export const Home = () => {
       </div>
 
     </div>
+  </div>
+</>
   );
 };

@@ -13,6 +13,7 @@ export const MainLayout = () => {
   const { currentUser, isEmailVerified } = useAuth();
   const location = useLocation();
 
+  const isHomePage = location.pathname === '/';
   const showVerificationAlert = currentUser && !isEmailVerified && location.pathname !== '/verify-email';
 
   return (
@@ -21,7 +22,7 @@ export const MainLayout = () => {
       <SidebarNav />
 
       {/* 2. Right Main Wrapper with Header, Main Scrollable Content & Footer */}
-      <div className="main-wrapper">
+      <div className={`main-wrapper ${isHomePage ? 'on-home-page' : ''}`}>
         <Header onOpenMobileNav={() => setMobileNavOpen(true)} />
 
         {showVerificationAlert && (
@@ -55,7 +56,7 @@ export const MainLayout = () => {
         )}
 
         <div className="main-content-scrollable">
-          <Outlet />
+          <Outlet context={{ onOpenMobileNav: () => setMobileNavOpen(true) }} />
         </div>
         <Footer />
       </div>

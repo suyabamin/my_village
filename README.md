@@ -6,9 +6,21 @@
 </p>
 
 <p align="center">
+  <a href="https://amader-alomthepara.vercel.app/">
+    <img src="https://img.shields.io/badge/🌐_LIVE_WEBSITE-Visit_Now-16A34A?style=for-the-badge" alt="Live Website" />
+  </a>
+</p>
+
+<p align="center">
+  <strong>🚀 Live Website:</strong>
+  <a href="https://amader-alomthepara.vercel.app/">amader-alomthepara.vercel.app</a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Platform-Web%20Application-16A34A?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
   <img src="https://img.shields.io/badge/Backend-Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Deployment-Vercel-black?style=for-the-badge&logo=vercel" />
   <img src="https://img.shields.io/badge/Status-Development-blue?style=for-the-badge" />
 </p>
 
@@ -18,9 +30,25 @@
 
 ---
 
+## 📌 Live Demo
+
+Explore the live version of Alamdipara Digital Village:
+
+<p align="center">
+  <a href="https://amader-alomthepara.vercel.app/">
+    <img src="https://img.shields.io/badge/OPEN_WEBSITE-🌐_Alamdipara_Digital_Village-16A34A?style=for-the-badge" alt="Open Website" />
+  </a>
+</p>
+
+**Website:** https://amader-alomthepara.vercel.app/
+
+**Hosting Platform:** Vercel
+
+---
+
 ## 📖 About the Project
 
-**আলমদীপাড়া ডিজিটাল গ্রাম** is a community-focused web platform designed to digitally connect the people, services, institutions, and activities of Alamdipara village.
+**আলমদীপাড়া ডিজিটাল গ্রাম (Alamdipara Digital Village)** is a community-focused web platform designed to digitally connect the people, services, institutions, and activities of Alamdipara village.
 
 The platform aims to make essential village information accessible through a single, user-friendly website. It brings together agriculture, education, religious institutions, sports, community organizations, emergency information, and local events.
 
@@ -34,6 +62,7 @@ Our vision is to build a modern digital village where residents can access usefu
 - Support agricultural and community development.
 - Promote education, sports, culture, and social activities.
 - Provide an administrative system for managing village information.
+- Build a connected and digitally accessible village community.
 
 ---
 
@@ -62,49 +91,79 @@ Our vision is to build a modern digital village where residents can access usefu
 The project uses modern web technologies and cloud services.
 
 ### Frontend
+
 - **React** – Component-based user interface.
 - **Vite** – Development server and build tooling.
-- **JavaScript / TypeScript** – Application logic (according to the existing project setup).
-- **CSS / Tailwind CSS** – Responsive styling (according to the configured project).
+- **JavaScript / TypeScript** – Application logic, according to the existing project setup.
+- **CSS / Tailwind CSS** – Responsive styling, according to the configured project.
 
 ### Backend & Database
+
 - **Firebase Authentication** – User authentication.
 - **Cloud Firestore** – Application data and content management.
 - **Firebase Storage** – Image and media storage.
 - **Firebase Cloud Messaging** – Notifications, where configured.
 
 ### Maps & External Services
+
 - **Leaflet / React Leaflet** – Interactive village map.
 - **OpenStreetMap** – Map tile provider.
 - **Open-Meteo API** – Weather information.
 
 ### Real-time Features
+
 - **WebRTC** – Real-time audio/video communication or streaming features, where implemented.
+
+### Deployment
+
+- **Vercel** – Web application hosting and deployment.
 
 ---
 
 ## 🖥️ Application Modules
 
-### 1. Digital Village Homepage
+### 1. 🏠 Digital Village Homepage
+
 The homepage provides quick access to the village's main services, important announcements, featured content, and recent activities.
 
-### 2. Interactive Village Map
+### 2. 🗺️ Interactive Village Map
+
 Residents can explore important village locations through an interactive map. Authorized administrators can manage map markers and location information.
 
-### 3. Agriculture & Weather
+### 3. 🌾 Agriculture & Weather
+
 Provides agricultural information and weather updates based on the village's geographical location.
 
-### 4. Youth Organization
+### 4. ⚽ Sports & Activities
+
+Provides sports-related information, tournaments, match schedules, and scoring features where implemented.
+
+### 5. 🎓 Education
+
+Provides information about educational institutions and academic activities within the village.
+
+### 6. 🕌 Mosques & Religious Information
+
+Provides mosque-related information, schedules, and religious activities.
+
+### 7. 🤝 Youth Organization
+
 Supports the activities of:
 
 **আলমদীপাড়া মাদকবিরোধী ও যুব উন্নয়ন সংঘ**
 
 The module includes organizational activities, schedules, and village development initiatives.
 
-### 5. Weekly Village Guard Schedule
+### 8. 🛡️ Weekly Village Guard Schedule
+
 Displays assigned village security duties. Administrators can assign registered users to specific days and time slots.
 
-### 6. Administrative Management
+### 9. 🖼️ Community Photo Gallery
+
+Provides a digital space for displaying village photographs, events, activities, and community memories.
+
+### 10. ⚙️ Administrative Management
+
 Authorized administrators can manage website content and supported modules without manually changing application code.
 
 ---
@@ -177,7 +236,12 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 ```
 
-**Important:** These variable names are examples. Match them with the names actually used in your Firebase configuration code. Never commit private credentials or service-account keys.
+**Important:**
+
+- These variable names are examples. Match them with the names actually used in your Firebase configuration code.
+- Never commit private credentials or service-account keys.
+- Add environment files containing secrets to `.gitignore`.
+- Configure the required environment variables in Vercel before deploying.
 
 ### 5. Start the Development Server
 
@@ -252,6 +316,7 @@ Security and data protection are important parts of this project.
 - Users must not be able to assign themselves administrative or guard privileges.
 - Sensitive user information should not be publicly displayed.
 - Environment files and private credentials must not be committed to Git.
+- Firebase Storage rules should restrict unauthorized file uploads and modifications.
 
 ---
 
@@ -289,7 +354,29 @@ Add actual project screenshots here as development progresses.
 **Location Reference:** Bil Barulla, Bangladesh  
 **Coordinates:** 24.397121, 90.858264
 
-[📍 View Village Location on Google Maps](https://maps.app.goo.gl/XsHYNvn2aeG6gfdQ7)
+<p align="center">
+  <a href="https://maps.app.goo.gl/XsHYNvn2aeG6gfdQ7">
+    <img src="https://img.shields.io/badge/📍_View_Village_Location-Google_Maps-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Google Maps Location" />
+  </a>
+</p>
+
+---
+
+## 🌐 Deployment
+
+The project is deployed using **Vercel**.
+
+**Live Website:** https://amader-alomthepara.vercel.app/
+
+To deploy your own instance:
+
+1. Push the project to a Git repository.
+2. Import the repository into [Vercel](https://vercel.com/).
+3. Configure the required environment variables.
+4. Set the correct build command and output directory according to the project.
+5. Deploy the application.
+
+For future updates, Vercel can automatically deploy changes from the connected Git repository.
 
 ---
 
@@ -304,6 +391,7 @@ Potential future enhancements include:
 - More accessible mobile experiences.
 - Additional data visualization and reporting.
 - Improved notification and emergency communication systems.
+- More community participation features.
 
 ---
 
@@ -338,6 +426,15 @@ For example, you may use the [MIT License](https://opensource.org/license/mit) i
 Alamdipara Digital Village is more than a website. It is an initiative to connect people, preserve local identity, improve access to information, and support the development of our village.
 
 <p align="center">
-  <strong>🌿 আলমদীপাড়া ডিজিটাল গ্রাম</strong><br/>
+  <strong>🌿 আলমদীপাড়া ডিজিটাল গ্রাম</strong>
+  <br/>
   <em>Connecting Our Village, Digitally.</em>
+  <br/><br/>
+  <a href="https://amader-alomthepara.vercel.app/">
+    <strong>🌐 Visit Live Website</strong>
+  </a>
+</p>
+
+<p align="center">
+  Made with ❤️ for Alamdipara
 </p>
